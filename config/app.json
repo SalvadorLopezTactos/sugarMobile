@@ -1,0 +1,52 @@
+{
+    "defaults": {
+        "native": {
+            "android": {
+                "packageName": "com.testunifinclean.crm",
+                "appDownloadUrl": "",
+                "binaryName": "testUnifinCleanCRM"
+            },
+            "ios": {
+                "bundleId": "com.testunifinclean.crm",
+                "appDownloadUrl": "",
+                "binaryName": "testUnifinCleanCRM",
+                "teamId": ""
+            }
+        },
+        "jsConfig": {
+            "appName": "Unifin CRM",
+            "productName": "Unifin CRM",
+            "brandName": "Unifin CRM",
+            "appBuild": "1",
+            "appVersion": "0.1.0",
+            "about": {
+                "privacy": "http://testunifinclean.com/mobile_privacy",
+                "tos": "http://testunifinclean.com/mobile_tos",
+                "support": "support.testunifinclean.com",
+                "supportEmail": "support@testunifinclean.com",
+                "copyrightText": "Copyright © 2018 testUnifinCleanCRM Inc. All Rights Reserved.",
+                "trademarkText": "testUnifinClean and testUnifinCleanCRM are trademarks owned by testUnifinCleanCRM Inc. All other trademarks are the property of their respective owners."
+            },
+            "ui": {
+                "icons": {
+                    "actions": {
+                        "barcode": "icon icon-barcode",
+                        "location": "icon icon-location-arrow",
+                        "hello": "icon icon-smile-o"
+                    }
+                }
+            }
+        }
+    },
+    "store": {
+        "native": {
+            "android": {
+                "signingKey": {
+                    "keystore": "",
+                    "storepass": "",
+                    "alias": ""
+                }
+            }
+        }
+    }
+}
