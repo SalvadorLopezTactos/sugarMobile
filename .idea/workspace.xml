@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e0c8fdfe-12fd-4b4e-8564-6bea407a107f" name="Default" comment="" />
+    <list default="true" id="e0c8fdfe-12fd-4b4e-8564-6bea407a107f" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/custom/views/call-edit-view/call-edit.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/custom/views/related-person-view/related_person_items.hbs" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/custom/views/related-person-view/related_person_list.hbs" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -24,7 +29,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app-dev.json" pinned="false" current-in-tab="false">
+      <file leaf-file-name="app-dev.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/config/app-dev.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="75">
@@ -34,11 +39,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+      <file leaf-file-name="related_person_list.hbs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/custom/views/related-person-view/related_person_list.hbs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="30">
+              <caret line="2" column="30" lean-forward="false" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="related_person_items.hbs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/custom/views/related-person-view/related_person_items.hbs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="17" lean-forward="false" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="call-edit.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/custom/views/call-edit-view/call-edit.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2179">
+              <caret line="179" column="0" lean-forward="false" selection-start-line="179" selection-start-column="0" selection-end-line="179" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -48,7 +73,7 @@
         <entry file="file://$PROJECT_DIR$/custom/check-in/check-in-action.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="462">
-              <caret line="68" column="42" lean-forward="true" selection-start-line="68" selection-start-column="42" selection-end-line="68" selection-end-column="42" />
+              <caret line="68" column="42" lean-forward="false" selection-start-line="68" selection-start-column="42" selection-end-line="68" selection-end-column="42" />
               <folding>
                 <marker date="1522093125549" expanded="true" signature="1403:1714" ph="{...}" />
                 <marker date="1522093125549" expanded="true" signature="1716:1810" ph="{...}" />
@@ -79,6 +104,9 @@
       <find>actions.map</find>
       <find>address</find>
       <find>registerRecordAction</find>
+      <find>EditView</find>
+      <find>model.set</find>
+      <find>parentModel</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$</dir>
@@ -103,6 +131,12 @@
         <option value="$PROJECT_DIR$/custom/related_person_view/related_person_view.js" />
         <option value="$PROJECT_DIR$/custom/fields/related-p/location.js" />
         <option value="$PROJECT_DIR$/custom/fields/related-p/detail.hbs" />
+        <option value="$PROJECT_DIR$/custom/views/related-person-view/related_person_view.js" />
+        <option value="$PROJECT_DIR$/custom/views/call-edit/call-edit.js" />
+        <option value="$PROJECT_DIR$/custom/call-edit-view/call-edit.js" />
+        <option value="$PROJECT_DIR$/custom/call-edit/call-edit.js" />
+        <option value="$PROJECT_DIR$/custom/views/call-edit-view/call-edit.js" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -173,6 +207,26 @@
               <item name="custom" type="462c0819:PsiDirectoryNode" />
               <item name="check-in" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="testUnifinClean" type="b2602c69:ProjectViewProjectNode" />
+              <item name="testUnifinClean" type="462c0819:PsiDirectoryNode" />
+              <item name="custom" type="462c0819:PsiDirectoryNode" />
+              <item name="views" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="testUnifinClean" type="b2602c69:ProjectViewProjectNode" />
+              <item name="testUnifinClean" type="462c0819:PsiDirectoryNode" />
+              <item name="custom" type="462c0819:PsiDirectoryNode" />
+              <item name="views" type="462c0819:PsiDirectoryNode" />
+              <item name="call-edit-view" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="testUnifinClean" type="b2602c69:ProjectViewProjectNode" />
+              <item name="testUnifinClean" type="462c0819:PsiDirectoryNode" />
+              <item name="custom" type="462c0819:PsiDirectoryNode" />
+              <item name="views" type="462c0819:PsiDirectoryNode" />
+              <item name="related-person-view" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -189,8 +243,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/custom/views/call-edit-view" />
+      <recent name="$PROJECT_DIR$/custom/views" />
+      <recent name="$PROJECT_DIR$/custom" />
+      <recent name="$PROJECT_DIR$/custom/views/related-person-view" />
       <recent name="$PROJECT_DIR$/custom/fields" />
-      <recent name="$PROJECT_DIR$/custom/scan-barcode" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -221,12 +278,12 @@
       <workItem from="1521565696125" duration="5615000" />
       <workItem from="1521648983909" duration="3572000" />
       <workItem from="1521656554553" duration="5435000" />
-      <workItem from="1521738974077" duration="20308000" />
+      <workItem from="1521738974077" duration="37223000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="34930000" />
+    <option name="totallyTimeSpent" value="51845000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="20" y="43" width="1352" height="767" extended-state="0" />
@@ -264,22 +321,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/custom/menu/scan-qr/scan-qr.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/custom/actions/call/call-action.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="14" lean-forward="false" selection-start-line="4" selection-start-column="14" selection-end-line="4" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/app.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -569,7 +610,7 @@
     <entry file="file://$PROJECT_DIR$/custom/check-in/check-in-action.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="462">
-          <caret line="68" column="42" lean-forward="true" selection-start-line="68" selection-start-column="42" selection-end-line="68" selection-end-column="42" />
+          <caret line="68" column="42" lean-forward="false" selection-start-line="68" selection-start-column="42" selection-end-line="68" selection-end-column="42" />
           <folding>
             <marker date="1522093125549" expanded="true" signature="1403:1714" ph="{...}" />
             <marker date="1522093125549" expanded="true" signature="1716:1810" ph="{...}" />
@@ -597,18 +638,82 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/app-dev.json">
+    <entry file="file://$PROJECT_DIR$/custom/views/related-person-view/related_person_view.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        <state relative-caret-position="-57">
+          <caret line="117" column="6" lean-forward="true" selection-start-line="117" selection-start-column="6" selection-end-line="117" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/custom/views/call-edit-view/call-edit.js.old">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1144">
+          <caret line="143" column="8" lean-forward="false" selection-start-line="143" selection-start-column="8" selection-end-line="143" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/custom/views/call-edit/call-edit.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="30" lean-forward="true" selection-start-line="16" selection-start-column="30" selection-end-line="16" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/custom/call-edit-view/call-edit.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="2" lean-forward="false" selection-start-line="12" selection-start-column="2" selection-end-line="12" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/custom/call-edit/call-edit.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="30" lean-forward="true" selection-start-line="19" selection-start-column="30" selection-end-line="19" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/custom/views/related-person-view/related_person_list.hbs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="30" lean-forward="false" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/custom/views/related-person-view/related_person_items.hbs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="17" lean-forward="false" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/custom/views/call-edit-view/call-edit.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2179">
+          <caret line="179" column="0" lean-forward="false" selection-start-line="179" selection-start-column="0" selection-end-line="179" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="60">
+          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/app-dev.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
         </state>
       </provider>
