@@ -118,6 +118,8 @@ const TodoListView = customization.extend(ListView, {
             },
         });
         */
+
+        //Los valores con los que se llena la lista, son los valores obtenidos por consumo de API
         return this.collection.reset(this.dataAPI);
 
     },
@@ -141,6 +143,7 @@ const TodoListView = customization.extend(ListView, {
                 modelCall:this.callModel,
 
                 //Se envía información obtenida por la petición al API desde sync en modelo de llamada
+                //pasados a través de la pantalla de creación de llamadas
                 dataAPI:this.dataAPI
             }
         });
@@ -238,8 +241,8 @@ const CallEditView = customization.extend(EditView, {
         this.model.set("name",options.modelCall.get('name'));
         //this.model.set("date_start",options.modelCall.get('date_start'));
         this.model.set("date_start",startDate);
-        this.model.set('date_end', endDate);
-        //this.model.set("date_end",options.modelCall.get('date_end'));
+        //this.model.set('date_end', endDate);
+        this.model.set("date_end",options.modelCall.get('date_end'));
         //this.model.set("duration_hours",options.modelCall.get('duration_hours'));
         //this.model.set("duration_minutes",options.modelCall.get('duration_minutes'));
         this.model.set("tct_related_person_txf_c",options.modelCliente.get('name'));
@@ -250,7 +253,6 @@ const CallEditView = customization.extend(EditView, {
         this.model.set("parent_type",'Accounts');
         this.model.set("parent_id",options.modelCliente.get('id'));
 
-        //duration_hours,duration_minutes
     },
 
     /**
@@ -330,11 +332,15 @@ const CallEditView = customization.extend(EditView, {
 
     },
 
-    /*Override*/
+    /* {Override}*/
+    /**
+     * Se sobreescribe la función para mostrar las fechas de inicio y fin correctamente
+     */
 
     _setDefaultDateValues() {
 
-        //const endDate=endDateSec.formatServer();
+        //Validación para evitar que los campos de fechas de inicio y fin se llenen automáticamente
+        //De esta manera los valores pasados en options de initialize se respetan y se establecen en campos date_start y date_end
 
         if(!_.isEmpty(this.model.get('date_start'))){
             return;
@@ -369,10 +375,13 @@ const CallEditView = customization.extend(EditView, {
 
         this._skipSetDefaults = true;
 
-        //this._super("_render");
         this._super("_setDefaultDateValues");
     },
 
+    /*{Override}
+    * Se sobreescribe función para establecer el tiempo de duración en pantalla de creación de llamadas
+    * y evitar que por default se estableza el tiempo con 15 min
+    * */
     _populateEndDateByDuration(duration) {
 
         const {model} = this;
@@ -397,14 +406,20 @@ const CallEditView = customization.extend(EditView, {
             : model.get('duration_minutes');
         */
         const minutes=model.get('duration_minutes');
-        const endDate = app
-            .date(startDate)
-            .add('h', hours)
-            .add('m', minutes)
-            .formatServer();
-
-        const desc= "CURRENT DATE: " +currentDate.formatServer()+ "** START DATE: "+startDate+ "** DIFF: "+diff+"**MINUTOS: "+app.date.duration(diff).minutes();
-        model.set('description',desc);
+        var endDate;
+        if(minutes==0){
+            endDate = app
+                .date(startDate)
+                .add('h', hours)
+                .add('m', 1)
+                .formatServer();
+        }else{
+            endDate = app
+                .date(startDate)
+                .add('h', hours)
+                .add('m', minutes)
+                .formatServer();
+        }
 
         model.set('date_end', endDate);
     },
