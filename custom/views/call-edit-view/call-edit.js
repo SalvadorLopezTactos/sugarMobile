@@ -51,10 +51,13 @@ customization.registerListItemDataProvider({
 const TodoListView = customization.extend(ListView, {
     callModel:{},
 
+    dataAPI:{},
+
     initialize(options) {
 
         //Se obtiene información pasada por FilteredListView
         this.callModel=options.context.attributes.data.parentModel;
+        this.dataAPI=options.context.attributes.data.dataAPI;
         this._super(options);
     },
 
@@ -74,12 +77,16 @@ const TodoListView = customization.extend(ListView, {
     loadData(options) {
 
         //Mostrar alerta para indicar que la petición ha iniciado
+
+        /*
         app.alert.show('api_load', {
             level: 'load',
             closeable: false,
             messages: app.lang.get('LBL_LOADING'),
         });
+        */
 
+        /*
         var idPersonaParent=this.callModel.get('tct_id_parent_txf_c');
         var strUrl='PersonasRelacionadas/'+idPersonaParent;
 
@@ -110,6 +117,8 @@ const TodoListView = customization.extend(ListView, {
                 app.alert.dismiss('api_load');
             },
         });
+        */
+        return this.collection.reset(this.dataAPI);
 
     },
 
@@ -125,9 +134,14 @@ const TodoListView = customization.extend(ListView, {
             // Los datos estarán disponibles en options.data que se encuentra en el método initialize de
             // CallEditView
             data:{
+                //Se envía información del cliente seleccionado en la lista
                 modelCliente:model,
 
-                modelCall:this.callModel
+                //Se envía información de la llamada
+                modelCall:this.callModel,
+
+                //Se envía información obtenida por la petición al API desde sync en modelo de llamada
+                dataAPI:this.dataAPI
             }
         });
     },
@@ -164,6 +178,8 @@ const CallEditView = customization.extend(EditView, {
     //Variable que sirve de bandera para mostrar u ocultar el campo tct_related_person_txf_c
     records:null,
 
+    //Variable que contiene información recibida por api
+    dataAPI:null,
     //Get event click on field tct_related_person_txf_c
     events: {
         //'click input[type="text"]': 'onClick',
@@ -193,10 +209,39 @@ const CallEditView = customization.extend(EditView, {
      * @param {options} Object Objeto con la información de la Llamada.
      */
     setInfoCall: function (options) {
+        //Se mantiene la información recibida por el API personalizada
+        this.dataAPI=options.dataAPI;
+
+        const startDate=options.modelCall.get('date_start');
+
+        //const startDate=new Date(startDateTxt);
+
+        const hours=options.modelCall.get('duration_hours');
+        const minutes=options.modelCall.get('duration_minutes');
+        //const minutes=5;
+
+        //const endDateSec = app.date().seconds(0);
+
+        //const endDate=endDateSec.formatServer();
+
+
+        const endDate=app
+            .date(startDate)
+            .add('h', hours)
+            .add('m', minutes)
+            .formatServer();
+
+
+        //Se establecen datos en el modelo actual de la llamada
+        //con los datos recibidos como parámetro desde el click al item de la lista related_person_items
         this.model.set('asigna_manual_c',true);
         this.model.set("name",options.modelCall.get('name'));
-        this.model.set("date_start",options.modelCall.get('date_start'));
-        this.model.set("date_end",options.modelCall.get('date_end'));
+        //this.model.set("date_start",options.modelCall.get('date_start'));
+        this.model.set("date_start",startDate);
+        this.model.set('date_end', endDate);
+        //this.model.set("date_end",options.modelCall.get('date_end'));
+        //this.model.set("duration_hours",options.modelCall.get('duration_hours'));
+        //this.model.set("duration_minutes",options.modelCall.get('duration_minutes'));
         this.model.set("tct_related_person_txf_c",options.modelCliente.get('name'));
         this.model.set("tct_id_parent_txf_c",options.modelCall.get('tct_id_parent_txf_c'));
         this.model.set("direction",options.modelCall.get('direction'));
@@ -205,6 +250,7 @@ const CallEditView = customization.extend(EditView, {
         this.model.set("parent_type",'Accounts');
         this.model.set("parent_id",options.modelCliente.get('id'));
 
+        //duration_hours,duration_minutes
     },
 
     /**
@@ -225,11 +271,19 @@ const CallEditView = customization.extend(EditView, {
 
             var strUrl='PersonasRelacionadas/'+idPersonaParent;
 
+            //Mostrar mensaje al iniciar petición
+            app.alert.show('api_load', {
+                level: 'load',
+                closeable: false,
+                messages: app.lang.get('Recuperando información, por favor espere'),
+            });
+
             //LLamada a API personalizada "PersonasRelacionadas"
             app.api.call('GET', app.api.buildURL(strUrl), null, {
                 success: response => {
                     if(response.records.length>=1){
                         this.records=true;
+                        this.dataAPI=response.records;
                     };
 
                 },
@@ -246,6 +300,8 @@ const CallEditView = customization.extend(EditView, {
                         this.model.set('asigna_manual_c',true);
 
                     }
+                    // Oculta alerta hasta que la petición se haya completado
+                    app.alert.dismiss('api_load');
                 },
             });
 
@@ -266,11 +322,91 @@ const CallEditView = customization.extend(EditView, {
                 view:TodoFilteredListView,
                 data:{
                     parentModel:this.model,
+                    dataAPI:this.dataAPI
                 },
             });
 
         }
 
+    },
+
+    /*Override*/
+
+    _setDefaultDateValues() {
+
+        //const endDate=endDateSec.formatServer();
+
+        if(!_.isEmpty(this.model.get('date_start'))){
+            return;
+        }
+
+        const startDate = app.date().seconds(0);
+
+        if (this._skipSetDefaults || !this.context.isCreate()) {
+            return;
+        }
+
+        // eslint-disable-next-line no-magic-numbers
+        if (startDate.minutes() > 30) {
+            startDate.add('h', 1).minutes(0);
+        } else if (startDate.minutes() > 0) {
+            // eslint-disable-next-line no-magic-numbers
+            startDate.minutes(30);
+        }
+
+        this.model.set({
+            date_start: startDate.formatServer(),
+            duration_hours: 0,
+            // eslint-disable-next-line no-magic-numbers
+            duration_minutes: 30,
+        });
+
+        if (this._isDateRangeMode) {
+            this._populateEndDateByDuration();
+        }
+
+        this.model.set({send_invites: false});
+
+        this._skipSetDefaults = true;
+
+        //this._super("_render");
+        this._super("_setDefaultDateValues");
+    },
+
+    _populateEndDateByDuration(duration) {
+
+        const {model} = this;
+        const startDate = model.get('date_start');
+        const currentDate=app.date().seconds(0);
+
+        if (!startDate) {
+            return;
+        }
+
+        const diff = app.date(currentDate.formatServer()).diff(startDate);
+        model.set('duration_hours', Math.floor(app.date.duration(diff).asHours()));
+        model.set('duration_minutes', app.date.duration(diff).minutes());
+
+        const hours = duration
+            ? duration.duration_hours
+            : model.get('duration_hours');
+
+        /*
+        const minutes = duration
+            ? duration.duration_minutes
+            : model.get('duration_minutes');
+        */
+        const minutes=model.get('duration_minutes');
+        const endDate = app
+            .date(startDate)
+            .add('h', hours)
+            .add('m', minutes)
+            .formatServer();
+
+        const desc= "CURRENT DATE: " +currentDate.formatServer()+ "** START DATE: "+startDate+ "** DIFF: "+diff+"**MINUTOS: "+app.date.duration(diff).minutes();
+        model.set('description',desc);
+
+        model.set('date_end', endDate);
     },
 
 });
