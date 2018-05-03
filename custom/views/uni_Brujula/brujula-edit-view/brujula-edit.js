@@ -25,10 +25,10 @@ customization.registerListItemDataProvider({
             itemId: this.buildId(model),
 
             // item complete state
-            url: model.get('thumbnailUrl'),
+            url: model.get('parent_type'),
 
             // item title
-            titulo: model.get('title'),
+            titulo: model.get('cliente'),
         };
     },
 
@@ -37,16 +37,25 @@ customization.registerListItemDataProvider({
     // Together with extractId method, this method creates a reference between
     // the record model instance and the list item element in DOM.
     buildId(model) {
-        return `photos_${model.id}`;
+        return `citas_${model.id}`;
     },
 
     // Converts "data-id" HTML attribute value to the ID of a model instance.
     extractId(id) {
-        return id.replace('photos_', '');
+        return id.replace('citas_', '');
     },
 });
 
 const CitasListView = customization.extend(ListView, {
+
+    dataCitas:{},
+
+    initialize(options) {
+
+        //Se obtiene información pasada por FilteredListView
+        this.dataCitas=options.context.attributes.data.dataCitas;
+        this._super(options);
+    },
     // Disable list item context menu.
     contextMenuDisabled: true,
 
@@ -61,48 +70,14 @@ const CitasListView = customization.extend(ListView, {
 
     // Override "loadData" method to implement custom logic for fetching data.
     loadData(options) {
-        // Since we have custom fetch logic, we need to take care of alert
-        // banners ourselves.
-        // See sidecar docs for details on how to use the alert module.
-        app.alert.show('ajax_load', {
-            level: 'load',
-            closeable: false,
-            messages: app.lang.get('LBL_LOADING'),
-        });
 
-        // Use Fetch API to pull data from external source
-        return window
-            .fetch('http://jsonplaceholder.typicode.com/photos')
-            .then(response => response.json())
-            .then(data => {
-                // Put the response into the view collection
-                // This will trigger list rendering.
-                this.collection.reset(data);
-
-                app.alert.show('ajax_load_success', {
-                    level: 'success',
-                    autoClose: true,
-                    messages: 'Data is loaded.',
-                });
-            })
-            .catch(err => {
-                app.alert.show('ajax_load_error', {
-                    level: 'error',
-                    autoClose: true,
-                    messages: 'Error loading data.',
-                });
-            })
-            .then(() => {
-                // Hide LBL_LOADING alert when AJAX completes successfully or
-                // otherwise.
-                app.alert.dismiss('ajax_load');
-            });
+        this.collection.reset(this.dataCitas);
     },
 
     // Implement "onItemClick" method to override the default behavior which is
     // navigation.
     onItemClick(model) {
-        const message = `${model.get('title')} URL: ${model.get('thumbnailUrl')}`;
+        const message = `${model.get('parent_type')} URL: ${model.get('cliente')}`;
         dialog.showAlert(message);
     },
 });
@@ -124,13 +99,19 @@ const CitasFilteredListView = customization.extend(FilteredListView, {
 
 const BrujulaEditView = customization.extend(EditView, {
 
+    dataCitas:null,
     events: {
         //'click input[type="text"]': 'onClick',
-        'click .class_uni_citas input[type="text"]': 'onClick',
+        'click .class_uni_citas input[type="text"]': 'onClickNavigateCitas',
+        //'change .class_fecha_reporte' : 'onChangeEvent',
+
     },
 
     initialize(options) {
         this._super(options);
+        self = this;
+        //this.model.on("change:fecha_reporte",this.getCitas, this); 
+        this.model.on("change:contactos_numero",this.getCitas, this); 
 
     },
 
@@ -140,21 +121,171 @@ const BrujulaEditView = customization.extend(EditView, {
      * Función que controla el evento click en el campo tct_related_person_txf_c
      *
      */
-    onClick: function(h) {
+    onClickNavigateCitas: function(h) {
 
             app.controller.loadScreen({
-                view:CitasFilteredListView
-                /*
+                view:CitasFilteredListView,
+                
                 data:{
-                    parentModel:this.model,
-                    dataAPI:this.dataAPI
+                    dataCitas:this.dataCitas,
+                    //dataAPI:this.dataAPI
                 },
-                */
+                
+                
             });
 
 
     },
 
+/*
+    onChangeEvent: function(h) {
+
+           app.alert.show('evento_change', {
+                    level: 'success',
+                    autoClose: true,
+                    messages: 'Evento change fecha.',
+                });
+
+
+    },
+*/
+    getCitas: function(){
+
+        /*
+        if(this.action == "view"){
+            return;
+        }
+        */
+
+        var fecha = this.model.get("fecha_reporte");
+        var Params = {
+            'promotor': this.model.get("assigned_user_id"),
+            'fecha': "2018-05-02",
+            //'fecha': fecha,
+        };
+
+        app.alert.show('brujula_load', {
+            level: 'load',
+            closeable: false,
+            messages: app.lang.get('LBL_LOADING'),
+        });
+
+         var Url = app.api.buildURL("Citas_brujula", '', {}, {});
+        
+        app.api.call("create", Url, {data: Params}, {
+                success: data => {
+                    if(data == "Existente"){
+                        app.alert.show('registro Existente', {
+                        level: 'error',
+                        messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
+                        autoClose: true
+                    });
+                    this.model.set("fecha_reporte", "");
+                    return;
+                    };
+
+                    this.dataCitas=data;
+
+                },
+                error: er => {
+                    app.alert.show('api_carga_error', {
+                        level: 'error',
+                        autoClose: true,
+                        messages: 'Error al cargar datos: '+er,
+                    });
+                },
+                complete: () => {
+                    if(this.dataCitas){
+                        //Se establece el campo asigna_manual_c para mostrar en la vista el campo tct_related_person_txf_c
+                        console.log('Peticion completa');
+
+                    }
+                    // Oculta alerta hasta que la petición se haya completado
+                    app.alert.dismiss('brujula_load');
+                },
+            });
+        /*
+        app.api.call("create", Url, {data: Params}, {
+            success: _.bind(function (data) {
+                if (self.disposed) {
+                    return;
+                }
+
+                //Ocultando alerta
+                app.alert.dismiss('brujula_load');
+
+                if(data == "Existente"){
+                    app.alert.show('registro Existente', {
+                        level: 'error',
+                        messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
+                        autoClose: true
+                    });
+                    self.model.set("fecha_reporte", "");
+                    return;
+                }
+                self.dataCitas=data;
+
+/*
+                var citasCleaned = [];
+                _.each(data, function(key, value) {
+
+                    var acompaniante = "";
+                    var estatus = "";
+                    var referenciada = "";
+                    if(!_.isEmpty(key.acompanante)){
+                        acompaniante = key.acompanante;
+                    }else{
+                        acompaniante = "Editar";
+                    }
+
+                    if(key.status == "Held"){
+                        estatus = "1";
+                    }
+                    else{
+                        estatus = "";
+                    }
+
+                    if(key.referenciada_c == 1){
+                        referenciada = "checked";
+                    }
+
+                    var duration_minutes = +key.duration_minutes;
+                    if(key.duration_hours != 0){
+                        var duration_hours =  +key.duration_hours * 60;
+
+                        duration_minutes += duration_hours;
+                    }
+
+                    var nueva_cita = {
+                        id: key.id,
+                        parent_id: key.parent_id,
+                        parent_name: key.cliente,
+                        duration_minutes: duration_minutes,
+                        //nuevo_traslado: duration_minutes,
+                        nuevo_traslado: 0,
+                        nuevo_referenciada: referenciada,
+                        nuevo_acompanante: acompaniante,
+                        nuevo_acompanante_id: key.user_id_c,
+                        nuevo_objetivo: key.objetivo_c,
+                        nuevo_estatus: estatus,
+                        nuevo_resultado: key.resultado_c,
+                    };
+                    citasCleaned.push(nueva_cita);
+                });
+*/
+                
+                /*
+                self.model.set("citas_originales", citasCleaned.length);
+                self.citas = citasCleaned;
+                self.model.set("citas_brujula",self.citas);
+                self.render();
+                //$(".estatus_cita").change(); //provocamos un change event en el estatus para que se recalculen los resultados
+                $(".objetivo_list").change();
+                
+            },self)
+        });
+        */
+    },
 
  
 });
