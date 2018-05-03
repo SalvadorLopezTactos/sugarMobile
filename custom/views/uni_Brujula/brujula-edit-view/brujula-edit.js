@@ -90,10 +90,24 @@ const CitasFilteredListView = customization.extend(FilteredListView, {
     },
 
     headerConfig: {
-        title: app.lang.get('Citas'),
+        title: 'Citas',
         buttons: {
-            mainMenu: true,
+            save: {label: 'Listo'},
+            cancel: {label: 'Regresar'},
         },
+    },
+
+    initialize(options){
+      this._super(options);
+      this.parentModel = options.data.parentModel;
+    },
+
+    onHeaderSaveClick() {
+        console.log('---listo---');
+        this.parentModel.set('name','ok-test');
+
+        // Closes the view and navigates back to the record edit view.
+        app.controller.goBack();
     },
 });
 
@@ -110,8 +124,8 @@ const BrujulaEditView = customization.extend(EditView, {
     initialize(options) {
         this._super(options);
         self = this;
-        //this.model.on("change:fecha_reporte",this.getCitas, this); 
-        this.model.on("change:contactos_numero",this.getCitas, this); 
+        //this.model.on("change:fecha_reporte",this.getCitas, this);
+        this.model.on("change:contactos_numero",this.getCitas, this);
 
     },
 
@@ -122,18 +136,14 @@ const BrujulaEditView = customization.extend(EditView, {
      *
      */
     onClickNavigateCitas: function(h) {
-
-            app.controller.loadScreen({
-                view:CitasFilteredListView,
-                
-                data:{
-                    dataCitas:this.dataCitas,
-                    //dataAPI:this.dataAPI
-                },
-                
-                
-            });
-
+      app.controller.loadScreen({
+             isDynamic: true,
+             view: CitasFilteredListView,
+             data: {
+                dataCitas:this.dataCitas,
+                parentModel: this.model,
+             },
+         });
 
     },
 
@@ -171,7 +181,7 @@ const BrujulaEditView = customization.extend(EditView, {
         });
 
          var Url = app.api.buildURL("Citas_brujula", '', {}, {});
-        
+
         app.api.call("create", Url, {data: Params}, {
                 success: data => {
                     if(data == "Existente"){
@@ -273,7 +283,7 @@ const BrujulaEditView = customization.extend(EditView, {
                     citasCleaned.push(nueva_cita);
                 });
 */
-                
+
                 /*
                 self.model.set("citas_originales", citasCleaned.length);
                 self.citas = citasCleaned;
@@ -281,17 +291,15 @@ const BrujulaEditView = customization.extend(EditView, {
                 self.render();
                 //$(".estatus_cita").change(); //provocamos un change event en el estatus para que se recalculen los resultados
                 $(".objetivo_list").change();
-                
+
             },self)
         });
         */
     },
 
- 
+
 });
 
 customization.register(BrujulaEditView,{module: 'uni_Brujula'});
 
 module.exports = BrujulaEditView;
-
-
