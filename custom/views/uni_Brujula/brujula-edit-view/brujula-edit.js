@@ -10,6 +10,7 @@ const dialog = require('%app.core%/dialog');
 const geolocation = require('%app.core%/geolocation');
 const AddressEditView = require('%app.views%/edit/address-edit-view');
 const NomadView = require('%app.views%/nomad-view');
+const DetailView = require('%app.views.detail%/detail-view');
 
 //5d753883-e8d8-2236-41a7-5a17a568f5bd
 
@@ -72,7 +73,7 @@ customization.registerListItemDataProvider({
     getStatus(model) {
 
         var estatus = model.get('status');
-        
+
         switch(estatus){
             case "1":
             estatus="REALIZADA";
@@ -87,7 +88,7 @@ customization.registerListItemDataProvider({
             default:
             estatus="";
         }
-        
+
         return estatus;
     },
 
@@ -116,16 +117,6 @@ const CitasListView = customization.extend(ListView, {
     // Specify list item template (see todo-list-item.hbs).
     listItemTpl: 'related_citas_items',
 
-    // // Override "loadData" method to implement custom logic for fetching data.
-    // loadData(options) {
-    //     this.collection.reset(this.dataCitas);
-    // },
-    //
-    // onAfterShow(options){
-    //   var a="test";
-    //   this.collection.reset(this.collection.models);
-    // },
-
     // Implement "onItemClick" method to override the default behavior which is
     // navigation.
     onItemClick(model) {
@@ -139,18 +130,6 @@ const CitasListView = customization.extend(ListView, {
             },
         });
 
-        // app.controller.navigate({
-        //      url: 'Citas_edit',
-        //      data: {
-        //         modelCita: model,
-        //         dataCitas: this.dataCitas,
-        //         modelBrujula: this.parentModel
-        //      },
-        // });
-
-
-        // const message = `${model.get('parent_type')} URL: ${model.get('cliente')}`;
-        // dialog.showAlert(message);
 
     },
 });
@@ -242,8 +221,8 @@ const CitasFilteredListView = customization.extend(FilteredListView, {
                 parent_id: key.attributes.parent_id,
                 parent_name: key.attributes.cliente,
                 duration_minutes: duration_minutes,
-                //nuevo_traslado: duration_minutes,
-                nuevo_traslado: 0,
+                nuevo_traslado: key.attributes.traslado,
+                //nuevo_traslado: 0,
                 nuevo_referenciada: referenciada,
                 nuevo_acompanante: acompaniante,
                 nuevo_acompanante_id: key.attributes.user_id_c,
@@ -299,6 +278,19 @@ function _validate(fields, errors, callback) {
   callback(null, fields, errors);
 };
 
+const BrujulaDetailView = customization.extend(DetailView, {
+  onAfterShow(){
+      //$(".createBtn").hide();
+      try {
+         var menu = $(".createBtn");
+         menu[1].classList.add('hide');
+     }
+     catch(err) {
+         console.log(err.message);
+     }
+
+  },
+});
 const BrujulaEditView = customization.extend(EditView, {
     dataCitas:null,
     events: {
@@ -311,7 +303,10 @@ const BrujulaEditView = customization.extend(EditView, {
     initialize(options) {
         this._super(options);
         self = this;
+
+
         this.model.on("change:fecha_reporte",this.getCitas, this);
+
         //this.model.on("change:contactos_numero",this.getCitas, this);
         this.model.on("change:contactos_duracion",this.changeDuration, this);
         this.model.on("change:tiempo_prospeccion",this.changeDuration, this);
@@ -336,10 +331,6 @@ const BrujulaEditView = customization.extend(EditView, {
     render: function () {
        this._super("_render");
        this.setHeaders();
-       // $( ".bloque1" ).before('<div class="field" style="background-color:#2c97de; color:white"> Contactos/Llamadas </div>' );
-       // $( ".bloque2" ).before('<div class="field" style="background-color:#2c97de; color:white"> Resultados </div>' );
-       // $( ".bloque3" ).before('<div class="field" style="background-color:#2c97de; color:white"> Citas </div>' );
-       // $( ".bloque4" ).before('<div class="field" style="background-color:#2c97de; color:white"> Tiempos </div>' );
    },
 
    setHeaders: function() {
@@ -347,7 +338,15 @@ const BrujulaEditView = customization.extend(EditView, {
       $( ".bloque1" ).before('<div class="field" style="background-color:#2c97de; color:white"> Contactos/Llamadas </div>' );
       $( ".bloque2" ).before('<div class="field" style="background-color:#2c97de; color:white"> Resultados </div>' );
       $( ".bloque3" ).before('<div class="field" style="background-color:#2c97de; color:white"> Citas </div>' );
-      $( ".bloque4" ).before('<div class="field" style="background-color:#2c97de; color:white"> Tiempos </div>' );
+      $( ".bloque4" ).before('<div class="field" style="background-color:#2c97de; color:white"> Tiempos (horas)</div>' );
+
+  },
+
+  onAfterShow(){
+    if (!this.isCreate) {
+        $(".header__btn--save").hide();
+        $(".delete").hide();
+    }
   },
 
 
@@ -374,7 +373,6 @@ const BrujulaEditView = customization.extend(EditView, {
      */
      changeDuration: function() {
 
-      console.log('cahangeduration....');
       var total = 0;
       var citas_brujula = this.model.get("citas_brujula");
       var contactos_duracion = this.model.get("contactos_duracion");
@@ -417,137 +415,139 @@ const BrujulaEditView = customization.extend(EditView, {
             return;
         }
         */
+        if (this.isCreate) {
+            var fecha = this.model.get("fecha_reporte");
+            var Params = {
+                'promotor': this.model.get("assigned_user_id"),
+                'fecha': this.model.get("fecha_reporte"), //"2018-05-02",
+                //'fecha': fecha,
+            };
 
-        var fecha = this.model.get("fecha_reporte");
-        var Params = {
-            'promotor': this.model.get("assigned_user_id"),
-            'fecha': this.model.get("fecha_reporte"), //"2018-05-02",
-            //'fecha': fecha,
-        };
-
-        app.alert.show('brujula_load', {
-            level: 'load',
-            closeable: false,
-            messages: app.lang.get('LBL_LOADING'),
-        });
-
-        var Url = app.api.buildURL("Citas_brujula", '', {}, {});
-
-        app.api.call("create", Url, {data: Params}, {
-            success: data => {
-                if(data == "Existente"){
-                    app.alert.show('registro Existente', {
-                        level: 'error',
-                        messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
-                        autoClose: true
-                    });
-                    this.model.set("fecha_reporte", "");
-                    return;
-                };
-
-                    //this.dataCitas=data;
-                    this.collection.models = data;
-
-                },
-                error: er => {
-                    app.alert.show('api_carga_error', {
-                        level: 'error',
-                        autoClose: true,
-                        messages: 'Error al cargar datos: '+er,
-                    });
-                },
-                complete: () => {
-                    // if(this.dataCitas){
-                        if(this.collection.models){
-                        //Se establece el campo asigna_manual_c para mostrar en la vista el campo tct_related_person_txf_c
-                        console.log('Peticion completa');
-
-                    }
-                    // Oculta alerta hasta que la petición se haya completado
-                    app.alert.dismiss('brujula_load');
-                },
+            app.alert.show('brujula_load', {
+                level: 'load',
+                closeable: false,
+                messages: app.lang.get('LBL_LOADING'),
             });
-        /*
-        app.api.call("create", Url, {data: Params}, {
-            success: _.bind(function (data) {
-                if (self.disposed) {
-                    return;
-                }
 
-                //Ocultando alerta
-                app.alert.dismiss('brujula_load');
+            var Url = app.api.buildURL("Citas_brujula", '', {}, {});
 
-                if(data == "Existente"){
-                    app.alert.show('registro Existente', {
-                        level: 'error',
-                        messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
-                        autoClose: true
-                    });
-                    self.model.set("fecha_reporte", "");
-                    return;
-                }
-                self.dataCitas=data;
-
-                  /*
-                var citasCleaned = [];
-                _.each(data, function(key, value) {
-
-                    var acompaniante = "";
-                    var estatus = "";
-                    var referenciada = "";
-                    if(!_.isEmpty(key.acompanante)){
-                        acompaniante = key.acompanante;
-                    }else{
-                        acompaniante = "Editar";
-                    }
-
-                    if(key.status == "Held"){
-                        estatus = "1";
-                    }
-                    else{
-                        estatus = "";
-                    }
-
-                    if(key.referenciada_c == 1){
-                        referenciada = "checked";
-                    }
-
-                    var duration_minutes = +key.duration_minutes;
-                    if(key.duration_hours != 0){
-                        var duration_hours =  +key.duration_hours * 60;
-
-                        duration_minutes += duration_hours;
-                    }
-
-                    var nueva_cita = {
-                        id: key.id,
-                        parent_id: key.parent_id,
-                        parent_name: key.cliente,
-                        duration_minutes: duration_minutes,
-                        //nuevo_traslado: duration_minutes,
-                        nuevo_traslado: 0,
-                        nuevo_referenciada: referenciada,
-                        nuevo_acompanante: acompaniante,
-                        nuevo_acompanante_id: key.user_id_c,
-                        nuevo_objetivo: key.objetivo_c,
-                        nuevo_estatus: estatus,
-                        nuevo_resultado: key.resultado_c,
+            app.api.call("create", Url, {data: Params}, {
+                success: data => {
+                    if(data == "Existente"){
+                        app.alert.show('registro Existente', {
+                            level: 'error',
+                            messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
+                            autoClose: true
+                        });
+                        this.model.set("fecha_reporte", "");
+                        return;
                     };
-                    citasCleaned.push(nueva_cita);
+
+                        //this.dataCitas=data;
+                        this.collection.models = data;
+
+                    },
+                    error: er => {
+                        app.alert.show('api_carga_error', {
+                            level: 'error',
+                            autoClose: true,
+                            messages: 'Error al cargar datos: '+er,
+                        });
+                    },
+                    complete: () => {
+                        // if(this.dataCitas){
+                            if(this.collection.models){
+                            //Se establece el campo asigna_manual_c para mostrar en la vista el campo tct_related_person_txf_c
+                            console.log('Peticion completa');
+
+                        }
+                        // Oculta alerta hasta que la petición se haya completado
+                        app.alert.dismiss('brujula_load');
+                    },
                 });
-                */
+            /*
+            app.api.call("create", Url, {data: Params}, {
+                success: _.bind(function (data) {
+                    if (self.disposed) {
+                        return;
+                    }
 
-                /*
-                self.model.set("citas_originales", citasCleaned.length);
-                self.citas = citasCleaned;
-                self.model.set("citas_brujula",self.citas);
-                self.render();
-                //$(".estatus_cita").change(); //provocamos un change event en el estatus para que se recalculen los resultados
-                $(".objetivo_list").change();
+                    //Ocultando alerta
+                    app.alert.dismiss('brujula_load');
 
-            },self)
-        });
-        */
+                    if(data == "Existente"){
+                        app.alert.show('registro Existente', {
+                            level: 'error',
+                            messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
+                            autoClose: true
+                        });
+                        self.model.set("fecha_reporte", "");
+                        return;
+                    }
+                    self.dataCitas=data;
+
+                      /*
+                    var citasCleaned = [];
+                    _.each(data, function(key, value) {
+
+                        var acompaniante = "";
+                        var estatus = "";
+                        var referenciada = "";
+                        if(!_.isEmpty(key.acompanante)){
+                            acompaniante = key.acompanante;
+                        }else{
+                            acompaniante = "Editar";
+                        }
+
+                        if(key.status == "Held"){
+                            estatus = "1";
+                        }
+                        else{
+                            estatus = "";
+                        }
+
+                        if(key.referenciada_c == 1){
+                            referenciada = "checked";
+                        }
+
+                        var duration_minutes = +key.duration_minutes;
+                        if(key.duration_hours != 0){
+                            var duration_hours =  +key.duration_hours * 60;
+
+                            duration_minutes += duration_hours;
+                        }
+
+                        var nueva_cita = {
+                            id: key.id,
+                            parent_id: key.parent_id,
+                            parent_name: key.cliente,
+                            duration_minutes: duration_minutes,
+                            //nuevo_traslado: duration_minutes,
+                            nuevo_traslado: 0,
+                            nuevo_referenciada: referenciada,
+                            nuevo_acompanante: acompaniante,
+                            nuevo_acompanante_id: key.user_id_c,
+                            nuevo_objetivo: key.objetivo_c,
+                            nuevo_estatus: estatus,
+                            nuevo_resultado: key.resultado_c,
+                        };
+                        citasCleaned.push(nueva_cita);
+                    });
+                    */
+
+                    /*
+                    self.model.set("citas_originales", citasCleaned.length);
+                    self.citas = citasCleaned;
+                    self.model.set("citas_brujula",self.citas);
+                    self.render();
+                    //$(".estatus_cita").change(); //provocamos un change event en el estatus para que se recalculen los resultados
+                    $(".objetivo_list").change();
+
+                },self)
+            });
+            */
+
+        }
     },
 
 
@@ -600,6 +600,7 @@ let CitaEditView = customization.extend(NomadView, {
     events: {
         //'click input[type="text"]': 'onClick',
         'click .checkbox_default': 'onClickCheck',
+        'change select[name="objetivo_list"]': 'onChangeObjetivo',
     },
 
     initialize(options) {
@@ -624,6 +625,8 @@ let CitaEditView = customization.extend(NomadView, {
         var sumaMinutos=duracionMinutos + parseInt(options.data.parentModel.get('duration_minutes'));
         this.strNuevaDuracion=sumaMinutos;
 
+        this.strNuevoTraslado=options.data.parentModel.get('traslado');
+
         var acompaniante=options.data.parentModel.get('acompanante');
         if(acompaniante==null){
             acompaniante="";
@@ -640,6 +643,11 @@ let CitaEditView = customization.extend(NomadView, {
         this.strObjetivo=options.data.parentModel.get('objetivo_c');
         this.strEstatus=options.data.parentModel.get('status');
         this.strResultado=options.data.parentModel.get('resultado_c');
+
+        //Cambio estatus
+        if (this.strEstatus == 'Held') {
+          this.strEstatus = 1;
+        }
 
 
     },
@@ -680,6 +688,139 @@ let CitaEditView = customization.extend(NomadView, {
 
     },
 
+    onChangeObjetivo:function(e){
+        var obj=e.currentTarget.value;
+
+        switch(obj){
+            //PRESENTACION
+            case "1":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='2'>No está interesado</option>"+
+                "<option value='3'>Está interesado, pero no en este momento</option>"+
+                "<option value='4'>Está Interesado. Se procede a generar expediente</option>"+
+                "<option value='5'>Está Interesado. Se agendó otra visita</option>"+
+                "<option value='6'>Está Interesado. Se recogió información</option>"+
+                "<option value='7'>Se cerró una venta</option>"
+                );
+            break;
+            //EXPEDIENTE
+            case "2":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='2'>No está interesado</option>"+
+                "<option value='3'>Está interesado, pero no en este momento</option>"+
+                "<option value='4'>Está Interesado. Se procede a generar expediente</option>"+
+                "<option value='5'>Está Interesado. Se agendó otra visita</option>"+
+                "<option value='6'>Está Interesado. Se recogió información</option>"+
+                "<option value='7'>Se cerró una venta</option>"
+                );
+            break;
+            //INCREMENTO
+            case "5":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='2'>No está interesado</option>"+
+                "<option value='3'>Está interesado, pero no en este momento</option>"+
+                "<option value='4'>Está Interesado. Se procede a generar expediente</option>"+
+                "<option value='5'>Está Interesado. Se agendó otra visita</option>"+
+                "<option value='6'>Está Interesado. Se recogió información</option>"+
+                "<option value='7'>Se cerró una venta</option>"
+                );
+            break;
+            //RENOVACION
+            case "6":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='2'>No está interesado</option>"+
+                "<option value='3'>Está interesado, pero no en este momento</option>"+
+                "<option value='4'>Está Interesado. Se procede a generar expediente</option>"+
+                "<option value='5'>Está Interesado. Se agendó otra visita</option>"+
+                "<option value='6'>Está Interesado. Se recogió información</option>"+
+                "<option value='7'>Se cerró una venta</option>"
+                );
+            break;
+            //VISITA OCULAR
+            case "7":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='9'>Se logró la visita ocular parcialmente, se necesita una segunda cita</option>"+
+                "<option value='10'>Se logró la visita ocular completa</option>"
+                );
+            break;
+            //COTEJO
+            case "8":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='11'>Se logró cotejar parcialmente, se necesita una segunda cita</option>"+
+                "<option value='12'>Se logró cotejar todos los documentos</option>"
+                );
+            break;
+            //FIRMA DE CONTRATO
+            case "10":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='15'>Se logró parcialmente, se necesita una segunda cita</option>"+
+                "<option value='13'>Se logró completamente</option>"
+                );
+            break;
+            //COBRANZA
+            case "4":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='14'>Aclaración de pagos</option>"+
+                "<option value='16'>No se aclararon los pagos</option>"
+                );
+            break;
+            //OTRO
+            case "9":
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>"+
+                "<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='2'>No está interesado</option>"+
+                "<option value='3'>Está interesado, pero no en este momento</option>"+
+                "<option value='4'>Está Interesado. Se procede a generar expediente</option>"+
+                "<option value='5'>Está Interesado. Se agendó otra visita</option>"+
+                "<option value='6'>Está Interesado. Se recogió información</option>"+
+                "<option value='7'>Se cerró una venta</option>"
+                );
+            break;
+            //SEGURO
+            case "11":
+            $("select[name='resultado_list']")
+            .html("<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='2'>No está interesado</option>"+
+                "<option value='3'>Está interesado, pero no en este momento</option>"+
+                "<option value='5'>Está Interesado. Se agendó otra visita</option>"+
+                "<option value='6'>Está Interesado. Se recogió información</option>"+
+                "<option value='7'>Se cerró una venta</option>"
+                );
+            break;
+            //CIERRE
+            case "12":
+            $("select[name='resultado_list']")
+            .html("<option value='1'>El cliente no estuvo presente, cita cancelada</option>"+
+                "<option value='15'>Se logró parcialmente, se necesita una segunda cita</option>"+
+                "<option value='13'>Se logró completamente</option>"
+                );
+            break;
+            //VALOR DEFAULT
+            default:
+            $("select[name='resultado_list']")
+            .html("<option value=''></option>");
+
+        }
+
+    },
+
     onHeaderSaveClick() {
 
         //$('.duracion').val()
@@ -716,12 +857,14 @@ let CitaEditView = customization.extend(NomadView, {
         }
 
         this.parentModel.set('cliente',this.strCliente);
+        this.parentModel.set('duration_hours',"0");
         this.parentModel.set('duration_minutes',$('.duracion').val());
         this.parentModel.set('referenciada_c',this.value_check);
         this.parentModel.set('acompaniante',this.strAcompaniante);
         this.parentModel.set('objetivo_c',$("select[name='objetivo_list']")[0].value);
         this.parentModel.set('status',$("select[name='estatus_list']")[0].value);
         this.parentModel.set('resultado_c',$("select[name='resultado_list']")[0].value);
+        this.parentModel.set('traslado',$('.traslado').val());
 
         this.parentModel.collection = this.collection;
         app.controller.goBack();
@@ -749,9 +892,10 @@ customization.registerRoutes([{
      });
     }
 }]);
-
 module.exports = CitaEditView;
 
 customization.register(BrujulaEditView,{module: 'uni_Brujula'});
-
 module.exports = BrujulaEditView;
+
+customization.register(BrujulaDetailView,{module: 'uni_Brujula'});
+module.exports = BrujulaDetailView;

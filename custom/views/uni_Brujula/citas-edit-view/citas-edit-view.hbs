@@ -1,7 +1,7 @@
 
 <!--
 <div style="position: absolute; min-height: 100%; width: 100%; background: #fff; padding-top: 20px">
-	
+
 	<span class="hello_world">Hello, World! Nueva vista custom</span>
 </div>
 -->
@@ -70,12 +70,11 @@
 		<div class="field field--enum fieldObjetivo">
 			<label class="field__label">Objetivo</label>
 			<div class="field__controls">
-				<span class="placeholder">Required</span>
+				<!-- <span class="placeholder">Required</span> -->
 
 				<select name="objetivo_list">
         			<option value="1">PRESENTACION</option>
         			<option value="2">EXPEDIENTE</option>
-        			<option value="3">SEGUNDA CITA</option>
         			<option value="4">COBRANZA</option>
         			<option value="5">INCREMENTO</option>
         			<option value="6">RENOVACION</option>
@@ -96,7 +95,7 @@
 		<div class="field field--enum fieldEstatus">
 			<label class="field__label">Estatus</label>
 			<div class="field__controls">
-				<span class="placeholder">Required</span>
+				<!-- <span class="placeholder">Required</span> -->
 
 				<select name="estatus_list">
         			<option value="1">REALIZADA</option>
@@ -114,16 +113,24 @@
 		<div class="field field--enum fieldResultado">
 			<label class="field__label">Resultado</label>
 			<div class="field__controls">
-				<span class="placeholder">Required</span>
+				<!-- <span class="placeholder">Required</span> -->
 
-				<select name="resultado_list">
-        			<option value="1">El cliente no estuvo presente, cita cancelada</option>
+				<select name="resultado_list">			
+					<option value="1">El cliente no estuvo presente, cita cancelada</option>
         			<option value="2">No está interesado</option>
         			<option value="3">Está interesado, pero no en este momento</option>
         			<option value="4">Está Interesado. Se procede a generar expediente</option>
         			<option value="5">Está Interesado. Se agendó otra visita</option>
         			<option value="6">Está Interesado. Se recogió información</option>
         			<option value="7">Se cerró una venta</option><option value=""></option>
+        			<option value='9'>Se logró la visita ocular parcialmente, se necesita una segunda cita</option>
+        			<option value='10'>Se logró la visita ocular completa</option>
+        			<option value='11'>Se logró cotejar parcialmente, se necesita una segunda cita</option>
+                	<option value='12'>Se logró cotejar todos los documentos</option>
+                	<option value='13'>Se logró completamente</option>
+                	<option value='14'>Aclaración de pagos</option>
+                	<option value='15'>Se logró parcialmente, se necesita una segunda cita</option>
+                	<option value='16'>No se aclararon los pagos</option>		
         		</select>
 				<i class="icondefault icon icon-caret-down selectArrow-icon"></i>
 			</div>
