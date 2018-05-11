@@ -12,27 +12,20 @@ const AddressEditView = require('%app.views%/edit/address-edit-view');
 const NomadView = require('%app.views%/nomad-view');
 const DetailView = require('%app.views.detail%/detail-view');
 
-//5d753883-e8d8-2236-41a7-5a17a568f5bd
 
-// Register list item data provider.
-// The provider facilitates the communication between a record model and the
-// list item template.
 customization.registerListItemDataProvider({
-    // Provider name is referenced in the list initialization below.
+    // Nombre de la plantilla de los items de citas relacionadas
     name: 'related_citas_items',
 
-    // Override prepareItemData to provide the context for the list item
-    // template.
     prepareItemData(model) {
         // The list item HBS template receives the following object.
         return {
-            // used to find model by id on item click.
+            // Utilizado para encontrar el modelo por id
             itemId: this.buildId(model),
 
-            // item complete state
+            //Nombres de los elementos a los que se hace referencia en template (related_citas_items.hbs)
             url: model.get('parent_type'),
 
-            // item title
             cliente: model.get('cliente'),
 
             estatus: this.getStatus(model),
@@ -43,10 +36,11 @@ customization.registerListItemDataProvider({
         };
     },
 
-    // Implement buildId method to calculate the value for "data-id" HTML
-    // attribute in the template (see todo-list-item.hbs).
-    // Together with extractId method, this method creates a reference between
-    // the record model instance and the list item element in DOM.
+    /**
+        * Se obtiene un identificador único para cada registro de la lista
+        * @param {object} model - Modelo obtenido por cada registro de la lista
+    */
+
     buildId(model) {
         return `citas_${model.id}`;
     },
@@ -56,7 +50,10 @@ customization.registerListItemDataProvider({
         return id.replace('citas_', '');
     },
 
-    //Determina color
+    /**
+        * Se establece color dinámicamente al registro actual de la lita
+        * @param {object} model - Modelo obtenido por cada registro de la lista
+    */
     getColor(model) {
         var color = '#f75f60';
         var objetivo = model.get('objetivo_c');
@@ -70,6 +67,10 @@ customization.registerListItemDataProvider({
         return color;
     },
 
+    /**
+        * Se establece estatus para que se muestre en la lista
+        * @param {object} model - Modelo obtenido por cada registro de la lista
+    */
     getStatus(model) {
 
         var estatus = model.get('status');
@@ -94,8 +95,11 @@ customization.registerListItemDataProvider({
 
 });
 
+
+//Definición de la vista de lista de citas relacionadas a una Persona
 const CitasListView = customization.extend(ListView, {
 
+    //Variable global que se llena para mostrar registros en la lista de citas relacionadas
     dataCitas:{},
 
     initialize(options) {
@@ -105,20 +109,17 @@ const CitasListView = customization.extend(ListView, {
         this.dataCitas=options.context.attributes.data.dataCitas;
 
     },
-    // Disable list item context menu.
+    
     contextMenuDisabled: true,
-
-    // Provide custom template (see todo-list.hbs).
+  
     template: 'related_citas_list',
 
-    // Specify list item provider defined above.
     listItemDataProvider: 'related_citas_items',
 
-    // Specify list item template (see todo-list-item.hbs).
+    // Referencia a template que muestra la lista (related_citas_items.hbs).
     listItemTpl: 'related_citas_items',
 
-    // Implement "onItemClick" method to override the default behavior which is
-    // navigation.
+    // Se sobreescribe función onItemClick para dirigir click hacia nueva vista CitaEditView
     onItemClick(model) {
         // ---- OK onItemClick(model) {
             app.controller.loadScreen({
@@ -151,11 +152,10 @@ const CitasFilteredListView = customization.extend(FilteredListView, {
 
     initialize(options){
       this._super(options);
+
+      //Se obtienen valores pasados desde vista de edición de Brújula
       this.parentModel = options.data.parentModel;
-      //this.dataCitas = options.data.dataCitas;
       this.dataCitas = this.parentModel.collection.models;
-      //this.dataCitas = this.collection.models;
-      //this.model.addValidationTask('CustomCurrencyValidationTask',_validate.bind(this));
   },
 
     // Override "loadData" method to implement custom logic for fetching data.
@@ -168,24 +168,12 @@ const CitasFilteredListView = customization.extend(FilteredListView, {
       this.collection.reset(this.collection.models);
   },
 
+  //Funcion que se ejecuta al dar click en el botón de Guardar
   onHeaderSaveClick() {
-    console.log('---listo---');
     this.dataCitas = this.collection.models;
-    console.log(this.dataCitas);
     var completa = true;
 
-        //Valida elementos completados de dataCitas
-        // this.dataCitas.forEach(function(element) {
-        //   //console.log(element.status);
-        //   if(element.objetivo_c && element.resultado_c && element.status){
-        //     //Cita completa
-        //   }else {
-        //     completa = false;
-        //   }
-        //
-        // });
-
-        //Genera citasCleaned
+        //Genera citasCleaned esperadas para establecerlas en campo citas_brujula
         var citasCleaned = [];
         _.each(this.dataCitas, function(key, value) {
 
@@ -240,20 +228,16 @@ const CitasFilteredListView = customization.extend(FilteredListView, {
         this.dataCitas = this.collection.models;
         this.parentModel.collection.models=this.dataCitas;
 
-        // Closes the view and navigates back to the record edit view.
+        // Cierra la vista y navega hacia un punto atrás de la historia de navegación
         app.controller.goBack();
     },
 
 });
 
+/* 
+** Función para validar que las citas relacionadas tengan establecidos los campos de Objetivo, Estatus y Resultado
+*/
 function _validate(fields, errors, callback) {
-    // Each validation task is called once during bean save.
-    // 'fields' is hash of fields being saved.
-    // 'errors' is hash of validation errors. If validation fails validator
-    // should push error object to 'errors' hash
-    // to let validation routine know that validation failed for specific field.
-    // Validation is async and 'callback' must be called when it completes
-    // (either successfully or with error).
     if (this.collection.models) {
         var errorCitas = false;
         //Valida citas relacionadas
@@ -267,7 +251,7 @@ function _validate(fields, errors, callback) {
       });
       }
 
-        //Agrega error
+        //Agrega error a campo custom de citas
         if(errorCitas){
           errors['tct_uni_citas_txf_c'] = {'required':true};
           errors['tct_uni_citas_txf_c']= {'Existen citas sin actualizar':true};
@@ -278,25 +262,32 @@ function _validate(fields, errors, callback) {
   callback(null, fields, errors);
 };
 
+// Definición de vista de detalle de Brújula
 const BrujulaDetailView = customization.extend(DetailView, {
   onAfterShow(){
-      //$(".createBtn").hide();
+
+    //Se oculta el botón de creación para evitar editar, duplicar y compartir registro de uni_Brujula
       try {
          var menu = $(".createBtn");
-         menu[1].classList.add('hide');
+         if (menu.length>1) {
+             menu[1].classList.add('hide');
+         }else if (menu) {
+             menu[0].classList.add('hide');
+         }
      }
      catch(err) {
          console.log(err.message);
      }
+
 
   },
 });
 const BrujulaEditView = customization.extend(EditView, {
     dataCitas:null,
     events: {
-        //'click input[type="text"]': 'onClick',
+
+        //Definición de nuevo evento click para campo custom de citas
         'click .class_uni_citas input[type="text"]': 'onClickNavigateCitas',
-        //'change .class_fecha_reporte' : 'onChangeEvent',
 
     },
 
@@ -333,6 +324,7 @@ const BrujulaEditView = customization.extend(EditView, {
        this.setHeaders();
    },
 
+//Se establecen los bloques de color azul en la vista de creación en uni_Brujula
    setHeaders: function() {
       //this.model.set('name','Backlog');
       $( ".bloque1" ).before('<div class="field" style="background-color:#2c97de; color:white"> Contactos/Llamadas </div>' );
@@ -351,7 +343,8 @@ const BrujulaEditView = customization.extend(EditView, {
 
 
     /**
-     * Función que controla el evento click en el campo tct_related_person_txf_c
+     * Función que se ejecuta al dar click en el campo custom tct_uni_citas_txf
+     * Carga la vista con la lista de citas relacionadas
      *
      */
      onClickNavigateCitas: function(h) {
@@ -394,20 +387,11 @@ const BrujulaEditView = customization.extend(EditView, {
       total = total / 60;
       this.model.set('tiempo_prospeccion',total);
   },
+       
+       /*
+       * Función que genera la petición hacia API para obtener citas relacionadas a un promotor
+       */
 
-
-    /*
-        onChangeEvent: function(h) {
-
-               app.alert.show('evento_change', {
-                        level: 'success',
-                        autoClose: true,
-                        messages: 'Evento change fecha.',
-                    });
-
-
-        },
-        */
         getCitas: function(){
 
         /*
@@ -465,127 +449,16 @@ const BrujulaEditView = customization.extend(EditView, {
                         app.alert.dismiss('brujula_load');
                     },
                 });
-            /*
-            app.api.call("create", Url, {data: Params}, {
-                success: _.bind(function (data) {
-                    if (self.disposed) {
-                        return;
-                    }
-
-                    //Ocultando alerta
-                    app.alert.dismiss('brujula_load');
-
-                    if(data == "Existente"){
-                        app.alert.show('registro Existente', {
-                            level: 'error',
-                            messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
-                            autoClose: true
-                        });
-                        self.model.set("fecha_reporte", "");
-                        return;
-                    }
-                    self.dataCitas=data;
-
-                      /*
-                    var citasCleaned = [];
-                    _.each(data, function(key, value) {
-
-                        var acompaniante = "";
-                        var estatus = "";
-                        var referenciada = "";
-                        if(!_.isEmpty(key.acompanante)){
-                            acompaniante = key.acompanante;
-                        }else{
-                            acompaniante = "Editar";
-                        }
-
-                        if(key.status == "Held"){
-                            estatus = "1";
-                        }
-                        else{
-                            estatus = "";
-                        }
-
-                        if(key.referenciada_c == 1){
-                            referenciada = "checked";
-                        }
-
-                        var duration_minutes = +key.duration_minutes;
-                        if(key.duration_hours != 0){
-                            var duration_hours =  +key.duration_hours * 60;
-
-                            duration_minutes += duration_hours;
-                        }
-
-                        var nueva_cita = {
-                            id: key.id,
-                            parent_id: key.parent_id,
-                            parent_name: key.cliente,
-                            duration_minutes: duration_minutes,
-                            //nuevo_traslado: duration_minutes,
-                            nuevo_traslado: 0,
-                            nuevo_referenciada: referenciada,
-                            nuevo_acompanante: acompaniante,
-                            nuevo_acompanante_id: key.user_id_c,
-                            nuevo_objetivo: key.objetivo_c,
-                            nuevo_estatus: estatus,
-                            nuevo_resultado: key.resultado_c,
-                        };
-                        citasCleaned.push(nueva_cita);
-                    });
-                    */
-
-                    /*
-                    self.model.set("citas_originales", citasCleaned.length);
-                    self.citas = citasCleaned;
-                    self.model.set("citas_brujula",self.citas);
-                    self.render();
-                    //$(".estatus_cita").change(); //provocamos un change event en el estatus para que se recalculen los resultados
-                    $(".objetivo_list").change();
-
-                },self)
-            });
-            */
-
         }
     },
 
 
 });
 
-// const NewListView  = customization.extend(AddressEditView, {
-//     // Declare 'click' event for the location button (see address-edit.hbs
-//     // template)
-//     initialize(options){
-//       this._super(options);
-//       this.parentModel = options.data.parentModel;
-//       this.collection = options.data.collection;
-//       console.log(options);
-//
-//       //this.model.addValidationTask('CustomCurrencyValidationTask',_validate.bind(this));
-//     },
-//
-//     headerConfig: {
-//         title: 'Cita Detalle',
-//         buttons: {
-//             save: {label: 'Listo'},
-//             cancel: {label: 'Regresar'},
-//         },
-//     },
-//
-//     onHeaderSaveClick() {
-//         console.log('---listo---');
-//         var completa = true;
-//         this.parentModel.set('cliente','test-a');
-//         this.parentModel.collection = this.collection;
-//         app.controller.goBack();
-//     }
-// });
 
-////////////
-//HABILITANDO CUSTOM VIEW PARA EDICIÓN DE CITAS
+//Definición de nueva vista para edición de Citas
 let CitaEditView = customization.extend(NomadView, {
-    // Specify the name of HBS template
+    // Se especifica el nombre del template
     template: 'citas-edit-view',
 
     // Configure the header
@@ -597,8 +470,8 @@ let CitaEditView = customization.extend(NomadView, {
         },
     },
 
+    //Definición de eventos
     events: {
-        //'click input[type="text"]': 'onClick',
         'click .checkbox_default': 'onClickCheck',
         'change select[name="objetivo_list"]': 'onChangeObjetivo',
     },
@@ -608,10 +481,6 @@ let CitaEditView = customization.extend(NomadView, {
         self = this;
         this._super(options);
 
-        /*
-        parentModel:model,
-                collection:model.collection,
-                */
                 this.parentModel = options.data.parentModel;
                 this.collection= options.data.collection;
 
@@ -673,6 +542,10 @@ let CitaEditView = customization.extend(NomadView, {
 
     },
 
+    /*
+    * Función que establece el valor en campo "referenciada" dependiendo
+    * el valor de checkbox en vista de creación de citas
+    */
     onClickCheck: function(e) {
         if(this.value_check==0){
             //Es la primera vez, se establece como 1
@@ -688,6 +561,9 @@ let CitaEditView = customization.extend(NomadView, {
 
     },
 
+    /* 
+    * Se obtiene valor de dropdown de objetivo para establecer dependencia de datos con dropdown de resultado
+    */
     onChangeObjetivo:function(e){
         var obj=e.currentTarget.value;
 
@@ -821,10 +697,10 @@ let CitaEditView = customization.extend(NomadView, {
 
     },
 
+    /* Valida objetivo, estatus y resultado
+    * Manda información de regreso a la vista de lista de Citas con nuevos valores establecidos 
+    */
     onHeaderSaveClick() {
-
-        //$('.duracion').val()
-        //$('.traslado').val()
 
         //Ocultando siempre los campos de error y removiendo las clases de error
         $(".errorObjetivo").hide();
