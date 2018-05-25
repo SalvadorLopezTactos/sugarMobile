@@ -6,7 +6,6 @@ const AddressEditView = require('%app.views%/edit/address-edit-view');
 const EditView = require('%app.views.edit%/edit-view');
 
 const AccountEditView = customization.extend(EditView, {
-
     initialize(options) {
         this._super(options);
         
@@ -52,9 +51,11 @@ const AccountEditView = customization.extend(EditView, {
                                     self.model.set('user_id2_c','7a83c151-6fc3-dc2b-b3a0-562a60aa3b74');
                                 }
                             }
+                        self._hideGuardar(modelo);
 
                         }, self)
             });
+
 
         }else{
         //Consultado registro
@@ -64,6 +65,23 @@ const AccountEditView = customization.extend(EditView, {
     }
 
 
+},
+
+_hideGuardar: function(modelo){
+
+    var tipo = this.model.get('tipo_registro_c');
+       var puesto = modelo.puestousuario_c;
+      //var puesto = app.user.attributes.type;
+       
+       if((tipo=="Prospecto" || tipo=="Cliente") && (puesto==6 || puesto==12 || puesto==17))
+       {
+           $(".header__btn--save").addClass("hide")
+       }
+       else
+       {
+           $(".header__btn--save").removeClass("hide")
+       }
+       
 },
 
 setPromotores: function () {
