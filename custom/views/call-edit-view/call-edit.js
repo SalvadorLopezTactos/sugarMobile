@@ -205,6 +205,27 @@ const CallEditView = customization.extend(EditView, {
 
     },
 
+    _render: function()  {  
+        this._super('_render');  
+
+        if(this.isCreate){
+
+            this.disableStatus();  
+        }
+        
+    },
+
+
+    /*
+    * Función que bloquea el campo de Estado en la creación de registro de una llamada
+    */
+    disableStatus: function(){
+
+        $('select[name="status"]').parent().parent().addClass("field--readonly");
+        $('select[name="status"]').parent().attr("style","pointer-events:none");
+
+    },
+
     /**
      * Función que establece datos en vista de creación de Llamadas
      * Esta función es llamada cuando options.data {initialize} no es undefined
