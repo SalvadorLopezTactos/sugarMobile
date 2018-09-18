@@ -373,6 +373,7 @@ const CallEditView = customization.extend(EditView, {
             return;
         }
 
+        /*Se deshabilita para que la fecha inicial se la misma que la actual
         // eslint-disable-next-line no-magic-numbers
         if (startDate.minutes() > 30) {
             startDate.add('h', 1).minutes(0);
@@ -380,6 +381,7 @@ const CallEditView = customization.extend(EditView, {
             // eslint-disable-next-line no-magic-numbers
             startDate.minutes(30);
         }
+        */
 
         this.model.set({
             date_start: startDate.formatServer(),
@@ -431,18 +433,18 @@ const CallEditView = customization.extend(EditView, {
         if(minutes==0){
             endDate = app
                 .date(startDate)
-                .add('h', hours+1)
+                .add('h', hours)
                 .add('m', 1)
                 .formatServer();
         }else{
             endDate = app
                 .date(startDate)
-                .add('h', hours+1)
+                .add('h', hours)
                 .add('m', minutes)
                 .formatServer();
         }
-
-        model.set('date_end', endDate);
+        //  model.set('date_end', endDate);
+        model.set('date_end', currentDate);
     },
 
 });
