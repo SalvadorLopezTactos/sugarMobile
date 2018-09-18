@@ -431,13 +431,13 @@ const CallEditView = customization.extend(EditView, {
         if(minutes==0){
             endDate = app
                 .date(startDate)
-                .add('h', hours)
+                .add('h', hours+1)
                 .add('m', 1)
                 .formatServer();
         }else{
             endDate = app
                 .date(startDate)
-                .add('h', hours)
+                .add('h', hours+1)
                 .add('m', minutes)
                 .formatServer();
         }
