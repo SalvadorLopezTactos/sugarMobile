@@ -203,6 +203,8 @@ const CallEditView = customization.extend(EditView, {
             this.model.on('sync', this.setIdParent(options), this);
         }
 
+        this.model.on('sync', this.readOnlyStatus,this);
+
     },
 
     _render: function()  {  
@@ -213,6 +215,25 @@ const CallEditView = customization.extend(EditView, {
             this.disableStatus();  
         }
         
+    },
+
+    /*
+    * Se bloquea campo "Estado" al tener registro de Reunión como Realizada o No Realizada
+    */
+
+    readOnlyStatus: function(){
+
+        if((this.model.get('status')=="Held" && !this.isCreate) || (this.model.get('status')=="Not Held" && !this.isCreate)){
+
+            $('select[name="status"]').parent().parent().addClass("field--readonly");
+            $('select[name="status"]').parent().attr("style","pointer-events:none");
+
+            //Se bloquea campo "Relacionado con"
+            $('.field.fast-click-highlighted>.field__controls--flex').parent().attr('style','pointer-events:none');
+            $('.field.fast-click-highlighted>.field__controls--flex').parent().addClass("field--readonly");
+
+        }
+
     },
 
 
