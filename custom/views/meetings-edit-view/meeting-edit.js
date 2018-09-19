@@ -25,6 +25,14 @@ const MeetingEditView = customization.extend(EditView, {
     },
 
     /*
+    * Función para evitar que el campo "Estado" se desbloquee al escribir en "Descripción" o 
+    * en "Relacionado con"
+    */
+    onAfterShow(options){
+      this.disableStatus();
+    },
+
+    /*
     * Se establecen como solo lectura el "Objetivo" y "Resultado" una vez que se ha sincronizado
     * completamente la información del registro y el Estado sea "Realizada" o "No Realizada"
     */

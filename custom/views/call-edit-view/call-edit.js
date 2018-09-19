@@ -218,6 +218,14 @@ const CallEditView = customization.extend(EditView, {
     },
 
     /*
+    * Función para evitar que el campo "Estado" se desbloquee al escribir en "Descripción" o 
+    * en "Relacionado con"
+    */
+    onAfterShow(options){
+      this.disableStatus();
+    },
+
+    /*
     * Se bloquea campo "Estado" al tener registro de Reunión como Realizada o No Realizada
     */
 
