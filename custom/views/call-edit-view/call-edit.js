@@ -227,13 +227,13 @@ const CallEditView = customization.extend(EditView, {
 
             $('select[name="status"]').parent().parent().addClass("field--readonly");
             $('select[name="status"]').parent().attr("style","pointer-events:none");
-
+            $(".field").css("pointer-events", "none");
+        
         }
 
         //Se bloquea campo "Relacionado con"
         $('.field.fast-click-highlighted>.field__controls--flex').parent().attr('style','pointer-events:none');
         $('.field.fast-click-highlighted>.field__controls--flex').parent().addClass("field--readonly");
-
     },
 
 
