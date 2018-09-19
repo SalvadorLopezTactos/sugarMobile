@@ -55,15 +55,16 @@ const MeetingEditView = customization.extend(EditView, {
             $('select[name="status"]').parent().parent().addClass("field--readonly");
             $('select[name="status"]').parent().attr("style","pointer-events:none");
 
-            //Se bloquea campo "Relacionado con"
-            $('.field.fast-click-highlighted>.field__controls--flex').parent().attr('style','pointer-events:none');
-            $('.field.fast-click-highlighted>.field__controls--flex').parent().removeClass('fast-click-highlighted');
-            $('.field.fast-click-highlighted>.field__controls--flex').parent().addClass("field--readonly");
-            
-            $('.field.fast-click-highlighted>.field__controls--flex').addClass('field__controls--readonly');
-            $('.field.fast-click-highlighted>.field__controls--flex').find(".inert").addClass('hide');
-            $('.field.fast-click-highlighted>.field__controls--flex').removeClass('field__controls--flex');
         }
+
+         //Se bloquea campo "Relacionado con"
+        $('.field.fast-click-highlighted>.field__controls--flex').parent().attr('style','pointer-events:none');
+        $('.field.fast-click-highlighted>.field__controls--flex').parent().removeClass('fast-click-highlighted');
+        $('.field.fast-click-highlighted>.field__controls--flex').parent().addClass("field--readonly");
+            
+        $('.field.fast-click-highlighted>.field__controls--flex').addClass('field__controls--readonly');
+        $('.field.fast-click-highlighted>.field__controls--flex').find(".inert").addClass('hide');
+        $('.field.fast-click-highlighted>.field__controls--flex').removeClass('field__controls--flex');
 
     },
 
