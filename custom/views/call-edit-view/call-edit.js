@@ -7,9 +7,9 @@
  * para filtrar personas relacionadas a la persona asignada a dicha llamada en un campo personalizado
  */
 
-const app = SUGAR.App;
-const customization = require('%app.core%/customization.js');
-const dialog = require('%app.core%/dialog');
+ const app = SUGAR.App;
+ const customization = require('%app.core%/customization.js');
+ const dialog = require('%app.core%/dialog');
 //const EditView = require('%app.views.edit%/edit-view');
 const EditView = require('%app.views.edit%/modules/meetings-calls-edit-view.js');
 //const NomadView = require('%app.views%/nomad-view');
@@ -178,6 +178,8 @@ const TodoFilteredListView = customization.extend(FilteredListView, {
 
 const CallEditView = customization.extend(EditView, {
 
+    fechaInicioTemp: "",
+
     //Variable que sirve de bandera para mostrar u ocultar el campo tct_related_person_txf_c
     records:null,
 
@@ -192,6 +194,13 @@ const CallEditView = customization.extend(EditView, {
     initialize(options) {
         this._super(options);
 
+        //Validación de fecha
+        if(this.isCreate){
+            this.model.addValidationTask('ValidaFechaPermitida', _.bind(this.validaFechaInicialCall, this));
+        }else{
+            this.model.addValidationTask('ValidaFechaMayoraInicial', _.bind(this.validaFechaInicial2Call, this));
+        }
+
         /*
         * Si options.data no es "undefined" llama al método para establecer datos a cada campo
         * en el modelo de la llamada
@@ -203,6 +212,9 @@ const CallEditView = customization.extend(EditView, {
             this.model.on('sync', this.setIdParent(options), this);
         }
 
+        this.model.on('sync', this.readOnlyStatus,this);
+        this.model.on('sync', this.cambioFecha, this);
+
     },
 
     _render: function()  {  
@@ -213,6 +225,144 @@ const CallEditView = customization.extend(EditView, {
             this.disableStatus();  
         }
         
+    },
+
+    cambioFecha: function () {
+        this.fechaInicioTemp = Date.parse(this.model.get("date_start"));   
+    },
+
+    /* 
+     * Valida que la Fecha Inicial no sea menor que la actual
+     * 19/09/2018
+     */
+    validaFechaInicialCall: function (fields, errors, callback) {
+
+        // FECHA INICIO
+        var dateInicio = new Date(this.model.get("date_start"));
+        var d = dateInicio.getDate();
+        var m = dateInicio.getMonth() + 1;
+        var y = dateInicio.getFullYear();
+        var fechaCompleta = [m, d, y].join('/');
+        // var dateFormat = dateInicio.toLocaleDateString();
+        var fechaInicio = Date.parse(fechaCompleta);
+
+
+        // FECHA ACTUAL
+        var dateActual = new Date();
+        var d1 = dateActual.getDate();
+        var m1 = dateActual.getMonth() + 1;
+        var y1 = dateActual.getFullYear();
+        var dateActualFormat = [m1, d1, y1].join('/');
+        var fechaActual = Date.parse(dateActualFormat);
+
+
+        if (fechaInicio < fechaActual) {
+            app.alert.show("Fecha no valida", {
+                level: "error",
+                title: "No puedes crear una Llamada con fecha menor al d&Iacutea de hoy",
+                autoClose: false
+            });
+
+            app.error.errorName2Keys['custom_message1'] = 'La fecha no puede ser menor a la actual';
+            errors['date_start'] = errors['date_start'] || {};
+            errors['date_start'].custom_message1 = true;
+        }
+        callback(null, fields, errors);
+    },
+
+    validaFechaInicial2Call: function (fields, errors, callback) {
+
+        // FECHA ACTUAL
+        var dateActual = new Date();
+        var d1 = dateActual.getDate();
+        var m1 = dateActual.getMonth() + 1;
+        var y1 = dateActual.getFullYear();
+        var dateActualFormat = [m1, d1, y1].join('/');
+        var fechaActual = Date.parse(dateActualFormat);
+
+        // FECHA INICIO ANTES DE CAMBIAR
+        var dateInicioTmp = new Date(this.fechaInicioTemp);
+        var d = dateInicioTmp.getDate();
+        var m = dateInicioTmp.getMonth() + 1;
+        var y = dateInicioTmp.getFullYear();
+        var fechaCompletaTmp = [m, d, y].join('/');
+        var fechaInicioTmp = Date.parse(fechaCompletaTmp);
+
+        // FECHA INICIO EN CAMPO
+        var dateInicio = new Date(this.model.get("date_start"));
+        var d = dateInicio.getDate();
+        var m = dateInicio.getMonth() + 1;
+        var y = dateInicio.getFullYear();
+        var fechaCompleta = [m, d, y].join('/');
+        var fechaInicioNueva = Date.parse(fechaCompleta);
+
+        if (fechaInicioTmp != fechaInicioNueva) {
+            if (fechaInicioTmp < fechaActual) {
+                if (fechaInicioNueva >= fechaInicioTmp) {
+                    console.log("Guarda por opcion 1");
+                }
+                else {
+                    app.alert.show("Fecha no valida", {
+                        level: "error",
+                        title: "No puedes guardar una Llamada con fecha menor a la que se habia establecido",
+                        autoClose: false
+                    });
+
+                    app.error.errorName2Keys['custom_message_date_init0'] = 'No puedes guardar una Llamada con fecha menor a la que se habia establecido';
+                    errors['date_start'] = errors['date_start'] || {};
+                    errors['date_start'].custom_message_date_init0 = true;
+                }
+
+                //callback(null, fields, errors);
+            }
+            if (fechaInicioTmp >= fechaActual) {
+                if (fechaInicioNueva >= fechaActual) {
+                    console.log("Guarda por opcion 2")
+                }
+                else {
+                    app.alert.show("Fecha no valida", {
+                        level: "error",
+                        title: "No puedes agendar Llamada con fecha menor al d&Iacutea de hoy",
+                        autoClose: false
+                    });
+
+                    app.error.errorName2Keys['custom_message_date_init1'] = 'No puedes agendar Llamada con fecha menor al d&Iacutea de hoy';
+                    errors['date_start'] = errors['date_start'] || {};
+                    errors['date_start'].custom_message_date_init1 = true;
+                }
+
+                //callback(null, fields, errors);
+            }
+        }
+        callback(null, fields, errors);
+    },
+
+
+    /*
+    * Función para evitar que el campo "Estado" se desbloquee al escribir en "Descripción" o 
+    * en "Relacionado con"
+    */
+    onAfterShow(options){
+      this.disableStatus();
+    },
+
+    /*
+    * Se bloquea campo "Estado" al tener registro de Reunión como Realizada o No Realizada
+    */
+
+    readOnlyStatus: function(){
+
+        if((this.model.get('status')=="Held" && !this.isCreate) || (this.model.get('status')=="Not Held" && !this.isCreate)){
+
+            $('select[name="status"]').parent().parent().addClass("field--readonly");
+            $('select[name="status"]').parent().attr("style","pointer-events:none");
+            $(".field").css("pointer-events", "none");
+        
+        }
+
+        //Se bloquea campo "Relacionado con"
+        $('.field.fast-click-highlighted>.field__controls--flex').parent().attr('style','pointer-events:none');
+        $('.field.fast-click-highlighted>.field__controls--flex').parent().addClass("field--readonly");
     },
 
 
@@ -232,7 +382,7 @@ const CallEditView = customization.extend(EditView, {
      *
      * @param {options} Object Objeto con la información de la Llamada.
      */
-    setInfoCall: function (options) {
+     setInfoCall: function (options) {
         //Se mantiene la información recibida por el API personalizada
         this.dataAPI=options.dataAPI;
 
@@ -250,10 +400,10 @@ const CallEditView = customization.extend(EditView, {
 
 
         const endDate=app
-            .date(startDate)
-            .add('h', hours)
-            .add('m', minutes)
-            .formatServer();
+        .date(startDate)
+        .add('h', hours)
+        .add('m', minutes)
+        .formatServer();
 
 
         //Se establecen datos en el modelo actual de la llamada
@@ -282,7 +432,7 @@ const CallEditView = customization.extend(EditView, {
      *
      * @param {options} Object Objeto con la información de la Llamada.
      */
-    setIdParent:function(options){
+     setIdParent:function(options){
 
         //Establecer parentModelId solo si el campo tct_id_parent_txf_c no tiene información
         if(this.model.get('tct_id_parent_txf_c')== "" ||
@@ -290,9 +440,9 @@ const CallEditView = customization.extend(EditView, {
             _.isEmpty(this.model.get('tct_id_parent_txf_c'))){
             this.model.set('tct_id_parent_txf_c',options.parentModelId);
 
-            var idPersonaParent=options.parentModelId
+        var idPersonaParent=options.parentModelId
 
-            var strUrl='PersonasRelacionadas/'+idPersonaParent;
+        var strUrl='PersonasRelacionadas/'+idPersonaParent;
 
             //Mostrar mensaje al iniciar petición
             app.alert.show('api_load', {
@@ -335,7 +485,7 @@ const CallEditView = customization.extend(EditView, {
      * Función que controla el evento click en el campo tct_related_person_txf_c
      *
      */
-    onClick: function(h) {
+     onClick: function(h) {
 
         if(this.model.get('tct_related_person_txf_c')=="SIN REGISTROS RELACIONADOS"){
             this.model.set("parent_type",'Accounts');
@@ -358,7 +508,7 @@ const CallEditView = customization.extend(EditView, {
      * Se sobreescribe la función para mostrar las fechas de inicio y fin correctamente
      */
 
-    _setDefaultDateValues() {
+     _setDefaultDateValues() {
 
         //Validación para evitar que los campos de fechas de inicio y fin se llenen automáticamente
         //De esta manera los valores pasados en options de initialize se respetan y se establecen en campos date_start y date_end
@@ -420,24 +570,24 @@ const CallEditView = customization.extend(EditView, {
         model.set('duration_minutes', app.date.duration(diff).minutes());
 
         const hours = duration
-            ? duration.duration_hours
-            : model.get('duration_hours');
+        ? duration.duration_hours
+        : model.get('duration_hours');
 
         /*
         const minutes = duration
             ? duration.duration_minutes
             : model.get('duration_minutes');
-        */
-        const minutes=model.get('duration_minutes');
-        var endDate;
-        if(minutes==0){
-            endDate = app
+            */
+            const minutes=model.get('duration_minutes');
+            var endDate;
+            if(minutes==0){
+                endDate = app
                 .date(startDate)
                 .add('h', hours)
                 .add('m', 1)
                 .formatServer();
-        }else{
-            endDate = app
+            }else{
+                endDate = app
                 .date(startDate)
                 .add('h', hours)
                 .add('m', minutes)
@@ -447,7 +597,7 @@ const CallEditView = customization.extend(EditView, {
         model.set('date_end', currentDate);
     },
 
-});
+    });
 
 customization.register(CallEditView,{module: 'Calls'});
 
