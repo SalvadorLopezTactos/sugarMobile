@@ -19,6 +19,7 @@ const MeetingEditView = customization.extend(EditView, {
 
         this.model.on('sync', this.readOnlyStatus,this);
         this.model.on('sync', this.cambioFecha, this);
+        this.model.on('sync', this.disableStatus2, this);
         this.model.on('data:sync:complete', this.disableObjective,this);        
     },
 
@@ -27,10 +28,9 @@ const MeetingEditView = customization.extend(EditView, {
         this._super();  
 
         if(this.isCreate){
-
-            this.disableStatus();  
+            this.disableStatus();
         }
-        
+
     },
 
     cambioFecha: function () {
@@ -205,12 +205,27 @@ const MeetingEditView = customization.extend(EditView, {
     */
 
     disableStatus: function(){
+            $('select[name="status"]').parent().parent().addClass("field--readonly");
+            $('select[name="status"]').parent().attr("style", "pointer-events:none");
+    },
 
-        $('select[name="status"]').parent().parent().addClass("field--readonly");
-        $('select[name="status"]').parent().attr("style","pointer-events:none");
+    disableStatus2: function(){
+        var arr=[];
+        $('input[data-type=time]').each(function(index, elem){
+            var a=$(elem).val().split(':');
+            var seconds = (a[0] * 60 * 60) + (a[1] * 60) ;
 
-    },  
+            arr.push(seconds);
+        });
+        var hour_end=Math.max.apply(null, arr);
+        var date_end=Date.parse(this.model.get('date_end'));
+        date_end+=hour_end;
 
+        if(date_end>Date.now() || app.user.attributes.id!=this.model.get('assigned_user_id')) {
+            $('select[name="status"]').parent().parent().addClass("field--readonly");
+            $('select[name="status"]').parent().attr("style", "pointer-events:none");
+        }
+    },
 
 });
 
