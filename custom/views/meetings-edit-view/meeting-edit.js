@@ -221,9 +221,14 @@ const MeetingEditView = customization.extend(EditView, {
         var date_end=Date.parse(this.model.get('date_end'));
         date_end+=hour_end;
 
-        if(date_end>Date.now() || app.user.attributes.id!=this.model.get('assigned_user_id')) {
-            $('select[name="status"]').parent().parent().addClass("field--readonly");
-            $('select[name="status"]').parent().attr("style", "pointer-events:none");
+        if(this.model.get('status')!='Held') {
+            if (date_end > Date.now() || app.user.attributes.id != this.model.get('assigned_user_id')) {
+                $('select[name="status"]').parent().parent().addClass("field--readonly");
+                $('select[name="status"]').parent().attr("style", "pointer-events:none");
+            } else {
+                $('select[name="status"]').parent().parent().removeClass("field--readonly");
+                $('select[name="status"]').parent().attr("style", "");
+            }
         }
     },
 
