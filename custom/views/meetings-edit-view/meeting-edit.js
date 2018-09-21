@@ -221,7 +221,7 @@ const MeetingEditView = customization.extend(EditView, {
         var date_end=Date.parse(this.model.get('date_end'));
         date_end+=hour_end;
 
-        if(this.model.get('status')!='Held') {
+        if(this.model.get('status')!='Held' || this.model.get('status')!="Not Held") {
             if (date_end > Date.now() || app.user.attributes.id != this.model.get('assigned_user_id')) {
                 $('select[name="status"]').parent().parent().addClass("field--readonly");
                 $('select[name="status"]').parent().attr("style", "pointer-events:none");
