@@ -17,6 +17,9 @@ const MeetingEditView = customization.extend(EditView, {
             this.model.addValidationTask('ValidaFechaMayoraInicial', _.bind(this.validaFechaInicial2, this));
         }
 
+        //Validación de Resultado de la Reunión
+        this.model.addValidationTask('resultadoCitaRequerido',_.bind(this.resultadoCitaRequerido, this));
+
         this.model.on('sync', this.readOnlyStatus,this);
         this.model.on('sync', this.cambioFecha, this);
         this.model.on('sync', this.disableStatus2, this);
@@ -170,6 +173,9 @@ const MeetingEditView = customization.extend(EditView, {
             $('select[name="resultado_c"]').parent().parent().addClass("field--readonly");
             $('select[name="resultado_c"]').parent().parent().attr("style","pointer-events:none");
 
+            //Selector para deshabilitar todos los campos
+            $(".field").css("pointer-events", "none");
+
         }
 
 
@@ -213,15 +219,17 @@ const MeetingEditView = customization.extend(EditView, {
         var arr=[];
         $('input[data-type=time]').each(function(index, elem){
             var a=$(elem).val().split(':');
-            var seconds = (a[0] * 60 * 60) + (a[1] * 60) ;
-
+           
+            var seconds = (parseInt(a[0]) * 60 * 60) + (parseInt(a[1]) * 60) ;
             arr.push(seconds);
         });
-        var hour_end=Math.max.apply(null, arr);
+        //var hour_end=Math.max.apply(null, arr);
+        var hour_end=arr[1];
         var date_end=Date.parse(this.model.get('date_end'));
         date_end+=hour_end;
 
         if(this.model.get('status')!='Held' || this.model.get('status')!="Not Held") {
+        
             if (date_end > Date.now() || app.user.attributes.id != this.model.get('assigned_user_id')) {
                 $('select[name="status"]').parent().parent().addClass("field--readonly");
                 $('select[name="status"]').parent().attr("style", "pointer-events:none");
@@ -230,6 +238,22 @@ const MeetingEditView = customization.extend(EditView, {
                 $('select[name="status"]').parent().attr("style", "");
             }
         }
+    },
+
+    /*
+    * Función para establecer el Resultado de la Reunión como requerido cuando ya ha sido
+    * "Realizada" o "No Realizada"
+    * */
+    resultadoCitaRequerido:function (fields, errors, callback) {
+      if(this.model.get('status')=='Held' || this.model.get('status')=='Not Held'){
+        if (this.model.get('resultado_c')=='') {
+          app.error.errorName2Keys['requerido_obj'] = 'El resultado de la cita es requerido';
+          errors['resultado_c'] = errors['resultado_c'] || {};
+          errors['resultado_c'].requerido_obj = true;
+          errors['resultado_c'].required = true;
+        }
+      }
+      callback(null, fields, errors);
     },
 
 });

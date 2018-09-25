@@ -201,6 +201,9 @@ const CallEditView = customization.extend(EditView, {
             this.model.addValidationTask('ValidaFechaMayoraInicial', _.bind(this.validaFechaInicial2Call, this));
         }
 
+        //Validación para resultado de llamada requerido
+        this.model.addValidationTask('resultCallReq',_.bind(this.resultCallRequerido, this));
+
         /*
         * Si options.data no es "undefined" llama al método para establecer datos a cada campo
         * en el modelo de la llamada
@@ -214,6 +217,8 @@ const CallEditView = customization.extend(EditView, {
 
         this.model.on('sync', this.readOnlyStatus,this);
         this.model.on('sync', this.cambioFecha, this);
+        this.model.on('sync', this.disableStatusBeforeDateEnd, this);
+        this.model.on('data:sync:complete', this.disableAllFields,this);
 
     },
 
@@ -230,6 +235,24 @@ const CallEditView = customization.extend(EditView, {
     cambioFecha: function () {
         this.fechaInicioTemp = Date.parse(this.model.get("date_start"));   
     },
+
+    /*
+    * Validación para establecer como requerido el resultado de la llamada
+    */
+
+    resultCallRequerido:function (fields, errors, callback) {
+        if(this.model.get('status')=='Held' || this.model.get('status')=='Not Held'){
+            if (this.model.get('tct_resultado_llamada_ddw_c')=='') {
+
+                app.error.errorName2Keys['requResultCall'] = 'El resultado de la Llamada es requerido';
+                errors['tct_resultado_llamada_ddw_c'] = errors['tct_resultado_llamada_ddw_c'] || {};
+                errors['tct_resultado_llamada_ddw_c'].requResultCall = true;
+                errors['tct_resultado_llamada_ddw_c'].required = true;
+            }
+        }
+        callback(null, fields, errors);
+    },
+
 
     /* 
      * Valida que la Fecha Inicial no sea menor que la actual
@@ -347,6 +370,20 @@ const CallEditView = customization.extend(EditView, {
     },
 
     /*
+    * Función que deshabilita todos los campos de la llamada cuando ya ha sido "Realizada" o no "Realizada"
+    */
+    disableAllFields(){
+
+        if((this.model.get('status')=="Held" && !this.isCreate) || (this.model.get('status')=="Not Held" && !this.isCreate)){
+
+            $(".field").css("pointer-events", "none");
+        
+        }
+
+
+    }, 
+
+    /*
     * Se bloquea campo "Estado" al tener registro de Reunión como Realizada o No Realizada
     */
 
@@ -356,8 +393,13 @@ const CallEditView = customization.extend(EditView, {
 
             $('select[name="status"]').parent().parent().addClass("field--readonly");
             $('select[name="status"]').parent().attr("style","pointer-events:none");
-            $(".field").css("pointer-events", "none");
+            //$(".field").css("pointer-events", "none");
         
+        }else{
+
+            $('select[name="status"]').parent().parent().removeClass("field--readonly");
+            $('select[name="status"]').parent().attr("style","");
+
         }
 
         //Se bloquea campo "Relacionado con"
@@ -374,6 +416,29 @@ const CallEditView = customization.extend(EditView, {
         $('select[name="status"]').parent().parent().addClass("field--readonly");
         $('select[name="status"]').parent().attr("style","pointer-events:none");
 
+    },
+
+    disableStatusBeforeDateEnd: function(){
+        var arr=[];
+        $('input[data-type=time]').each(function(index, elem){
+            var a=$(elem).val().split(':');
+            var seconds = (parseInt(a[0]) * 60 * 60) + (parseInt(a[1]) * 60) ;
+            arr.push(seconds);
+        });
+        //var hour_end=Math.max.apply(null, arr);
+        var hour_end=arr[1];
+        var date_end=Date.parse(this.model.get('date_end'));
+        date_end+=hour_end;
+
+        if(this.model.get('status')!='Held' || this.model.get('status')!="Not Held") {
+            if (date_end > Date.now() || app.user.attributes.id != this.model.get('assigned_user_id')) {
+                $('select[name="status"]').parent().parent().addClass("field--readonly");
+                $('select[name="status"]').parent().attr("style", "pointer-events:none");
+            } else {
+                $('select[name="status"]').parent().parent().removeClass("field--readonly");
+                $('select[name="status"]').parent().attr("style", "");
+            }
+        }
     },
 
     /**
