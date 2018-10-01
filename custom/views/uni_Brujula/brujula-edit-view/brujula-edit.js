@@ -281,8 +281,26 @@ function _validate(fields, errors, callback) {
       }
 
   }
+  if(this.collection.models == null || this.collection.models == undefined || this.collection.models.length==0){
+
+    errors['tct_uni_citas_txf_c'] = {'required':true};
+    errors['tct_uni_citas_txf_c']= {'Favor de actualizar citas':true};
+
+  }
 
   callback(null, fields, errors);
+};
+
+function _duplicateBrujula(fields, errors, callback){
+
+  if(this.flagDuplicate==1){
+
+    errors['fecha_reporte'] = {'required':true};
+    errors['fecha_reporte']= {'Ya existe un registro para el promotor seleccionado con la fecha seleccionada':true};
+  }
+  
+  callback(null, fields, errors);
+  
 };
 
 // Definición de vista de detalle de Brújula
@@ -307,6 +325,7 @@ const BrujulaDetailView = customization.extend(DetailView, {
 });
 const BrujulaEditView = customization.extend(EditView, {
     dataCitas:null,
+    flagDuplicate:null,
     events: {
 
         //Definición de nuevo evento click para campo custom de citas
@@ -325,8 +344,12 @@ const BrujulaEditView = customization.extend(EditView, {
         this.model.on("change:contactos_duracion",this.changeDuration, this);
         this.model.on("change:tiempo_prospeccion",this.changeDuration, this);
 
-        //Validation task
+
+        //Validación para no permitir guardar brújula en caso de que se haya encontrado duplicada
+        this.model.addValidationTask('Valida_brujula_duplicate',_duplicateBrujula.bind(this));
+        //Validación para no permitir guardar registro mientras no se hayan generad citas
         this.model.addValidationTask('Valida citas',_validate.bind(this));
+
     },
 
     handleValidationError(error) {
@@ -440,15 +463,20 @@ const BrujulaEditView = customization.extend(EditView, {
 
             app.api.call("create", Url, {data: Params}, {
                 success: data => {
+
+                  this.flagDuplicate=0;
                     if(data == "Existente"){
                         app.alert.show('registro Existente', {
                             level: 'error',
                             messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
                             autoClose: true
                         });
-                        this.model.set("fecha_reporte", "");
+                        this.model.set("fecha_reporte", this.model.get('fecha_reporte'));
+                        this.flagDuplicate=1;
                         return;
                     };
+
+
 
                         //this.dataCitas=data;
                         this.collection.models = data;
