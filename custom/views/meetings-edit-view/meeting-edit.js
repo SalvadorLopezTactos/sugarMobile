@@ -19,11 +19,11 @@ const MeetingEditView = customization.extend(EditView, {
 
         //Validación de Resultado de la Reunión
         this.model.addValidationTask('resultadoCitaRequerido',_.bind(this.resultadoCitaRequerido, this));
-
         this.model.on('sync', this.readOnlyStatus,this);
         this.model.on('sync', this.cambioFecha, this);
         this.model.on('sync', this.disableStatus2, this);
-        this.model.on('data:sync:complete', this.disableObjective,this);        
+        this.model.on('data:sync:complete', this.disableObjective,this); 
+
     },
 
     _render: function()  
@@ -32,6 +32,12 @@ const MeetingEditView = customization.extend(EditView, {
 
         if(this.isCreate){
             this.disableStatus();
+
+            //Se oculta campo de resultado en la creación de la Reunión
+            /*Solo será visible el resultado cuando el estado se Realizada o No Realizada*/
+            if(this.model.get('status')=='Planned'){
+                $('.result_meeting_class').hide();
+            }
         }
 
     },
