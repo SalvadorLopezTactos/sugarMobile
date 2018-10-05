@@ -281,12 +281,15 @@ function _validate(fields, errors, callback) {
       }
 
   }
+
+  /*
   if(this.collection.models == null || this.collection.models == undefined || this.collection.models.length==0){
 
     errors['tct_uni_citas_txf_c'] = {'required':true};
     errors['tct_uni_citas_txf_c']= {'Favor de actualizar citas':true};
 
   }
+  */
 
   callback(null, fields, errors);
 };
@@ -350,6 +353,7 @@ const BrujulaEditView = customization.extend(EditView, {
         //Validación para no permitir guardar registro mientras no se hayan generad citas
         this.model.addValidationTask('Valida citas',_validate.bind(this));
 
+
     },
 
     handleValidationError(error) {
@@ -368,6 +372,9 @@ const BrujulaEditView = customization.extend(EditView, {
     render: function () {
        this._super("_render");
        this.setHeaders();
+
+
+        this.getCitas();
    },
 
 //Se establecen los bloques de color azul en la vista de creación en uni_Brujula
@@ -466,11 +473,13 @@ const BrujulaEditView = customization.extend(EditView, {
 
                   this.flagDuplicate=0;
                     if(data == "Existente"){
+                      /*
                         app.alert.show('registro Existente', {
                             level: 'error',
                             messages: 'Ya existe un registro para el promotor seleccionado con la fecha ' + fecha,
                             autoClose: true
                         });
+                        */
                         this.model.set("fecha_reporte", this.model.get('fecha_reporte'));
                         this.flagDuplicate=1;
                         return;
