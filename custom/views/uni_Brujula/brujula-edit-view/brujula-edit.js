@@ -152,6 +152,7 @@ const CitasListView = customization.extend(ListView, {
                 parentModel: model,
                 collection: model.collection,
             },
+            context: this.context
         });
 
 
@@ -405,10 +406,11 @@ const BrujulaEditView = customization.extend(EditView, {
          isDynamic: true,
          view: CitasFilteredListView,
          data: {
-            dataCitas:this.dataCitas,
+                dataCitas:this.dataCitas,
                 //dataCitas:this.collection.models,
                 parentModel: this.model,
             },
+          //context: this.context,
         });
 
   },
@@ -544,6 +546,9 @@ let CitaEditView = customization.extend(NomadView, {
 
         this.parentModel = options.data.parentModel;
         this.collection= options.data.collection;
+
+        //this.parentModel = this.context.get('data').parentModel;
+        //this.collection= this.context.get('data').collection;
 
         this.strCliente = options.data.parentModel.get('cliente');
         var duracionHours=options.data.parentModel.get('duration_hours');
@@ -778,13 +783,29 @@ let CitaEditView = customization.extend(NomadView, {
 
       }
 
+      var positionParentCollection=null;
+      for(var j=0;j<this.context.get('collection').models.length;j++){
+        if(this.context.get('collection').models[j].attributes.id==id_cita){
+          positionParentCollection=j;
+
+        }
+      }
+
+
       //Eliminando cita seleccionada
+      /*
       if( position!=null ){
         this.collection.models.splice(position,1)
       }
+      */
+      
+      //this.collection.remove(this.collection.models[position]);
+      //Removiendo item de la lista inicial (this.collection.models) de FilteredListView onAfterShow 
+      this.context.get('collection').models.splice(positionParentCollection,1);
+
+      //collectionCitas.remove(this.collection.models[position]);
       
       //Regresando a la vista de lista de las citas relacionadas de la brújula
-      this.parentModel.collection = this.collection;
       app.controller.goBack();
       
         
