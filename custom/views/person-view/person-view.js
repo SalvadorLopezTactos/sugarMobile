@@ -62,10 +62,12 @@ const AccountEditView = customization.extend(EditView, {
         //Estableciendo como solo lectura campos de promotores
         this.model.on('sync', this.setPromotores, this);
 
-    }
+        }
 
+        //Validación de teléfono
+        this.model.addValidationTask('validatePhoneFormat', _.bind(this.validatePhoneFormat, this));
 
-},
+    },
 
 _hideGuardar: function(modelo){
 
@@ -89,6 +91,23 @@ setPromotores: function () {
     $('.promotor_class').attr('style','pointer-events: none;');
 
 },
+
+validatePhoneFormat:function(fields, errors, callback){
+
+    var expreg =/^[0-9]{8,10}$/;
+
+    if( this.model.get('phone_office') != "" && this.model.get('phone_office') != undefined){
+
+        if(!expreg.test(this.model.get('phone_office'))){
+        	errors['phone_office'] = {'required':true};
+        	errors['phone_office']= {'Formato incorrecto, el tel\u00E9fono debe contener entre 8 y 10 d\u00EDgitos.':true};
+        }
+
+    }
+
+    callback(null, fields, errors);   
+
+}
 
 });
 
