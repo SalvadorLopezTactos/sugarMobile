@@ -242,7 +242,7 @@ const CallEditView = customization.extend(EditView, {
 
     resultCallRequerido:function (fields, errors, callback) {
         if(this.model.get('status')=='Held' || this.model.get('status')=='Not Held'){
-            if (this.model.get('tct_resultado_llamada_ddw_c')=='') {
+            if (this.model.get('tct_resultado_llamada_ddw_c')=='' || this.model.get('tct_resultado_llamada_ddw_c')==undefined) {
 
                 app.error.errorName2Keys['requResultCall'] = 'El resultado de la Llamada es requerido';
                 errors['tct_resultado_llamada_ddw_c'] = errors['tct_resultado_llamada_ddw_c'] || {};
