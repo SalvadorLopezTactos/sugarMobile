@@ -242,8 +242,18 @@ const MeetingEditView = customization.extend(EditView, {
             } else {
                 $('select[name="status"]').parent().parent().removeClass("field--readonly");
                 $('select[name="status"]').parent().attr("style", "");
+                this.deleteHeldOption();
             }
         }
+    },
+
+
+    /*
+    * Función que elimina opción de "Realizada" cuando se haya cumplido la hora fin de la Reunión
+    */
+    deleteHeldOption: function(){
+
+        $('select[name="status"] option[value="Held"]').remove();
     },
 
     /*
