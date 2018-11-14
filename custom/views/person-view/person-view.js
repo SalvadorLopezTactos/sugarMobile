@@ -116,21 +116,21 @@ validatePhoneFormat:function(fields, errors, callback){
 			errors['phone_office']= {'Formato incorrecto, el tel\u00E9fono debe contener entre 8 y 10 d\u00EDgitos.':true};
 		}
 
-	}
+		var cont=0;
 
-	var cont=0;
-
-	var lengthTel=this.model.get('phone_office').length;
-	var num_tel=this.model.get('phone_office');
+		var lengthTel=this.model.get('phone_office').length;
+		var num_tel=this.model.get('phone_office');
 	
-	//Checando número de teléfono con únicamente caracteres repetidos
-	var arr_nums_tel=num_tel.split(num_tel.charAt(0));
+		//Checando número de teléfono con únicamente caracteres repetidos
+		var arr_nums_tel=num_tel.split(num_tel.charAt(0));
 
-	if( arr_nums_tel.length-1 == lengthTel ){
+		if( arr_nums_tel.length-1 == lengthTel ){
 		errors['phone_office'] = {'required':true};
 		errors['phone_office']= {'Tel\u00E9fono Inv\u00E1lido, caracteres repetidos':true};
+		}
 
 	}
+
 		              
     callback(null, fields, errors);   
 
