@@ -38,8 +38,8 @@ const AccountEditView = customization.extend(EditView, {
                         		self.model.set('promotorcredit_c',modelo.name);
                         		self.model.set('user_id2_c',modelo.id);
                         	}else {
-                        		self.model.set('promotorcredit_c','Adriana Gayosso Cruz');
-                        		self.model.set('user_id2_c','7a83c151-6fc3-dc2b-b3a0-562a60aa3b74');
+                        		self.model.set('promotorcredit_c','9 - Sin Gestor');
+                        		self.model.set('user_id2_c','569246c7-da62-4664-ef2a-5628f649537e');
                         	}
                             //if(contains.call(modelo.get('productos_c'), "1")==false && contains.call(modelo.get('productos_c'), "3") == false && contains.call(modelo.get('productos_c'), "4") == false){
                             	if(productos.indexOf("1") == -1 && productos.indexOf("3") == -1 && productos.indexOf("4") == -1){
@@ -47,8 +47,8 @@ const AccountEditView = customization.extend(EditView, {
                             		self.model.set('user_id_c','569246c7-da62-4664-ef2a-5628f649537e');
                             		self.model.set('promotorfactoraje_c', 'Maria de Lourdes Campos Toca');
                             		self.model.set('user_id1_c', 'a04540fc-e608-56a7-ad47-562a6078519d');
-                            		self.model.set('promotorcredit_c','Adriana Gayosso Cruz');
-                            		self.model.set('user_id2_c','7a83c151-6fc3-dc2b-b3a0-562a60aa3b74');
+                            		self.model.set('promotorcredit_c','9 - Sin Gestor');
+                            		self.model.set('user_id2_c','569246c7-da62-4664-ef2a-5628f649537e');
                             	}
                             }
                             self._hideGuardar(modelo);
