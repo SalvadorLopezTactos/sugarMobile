@@ -658,8 +658,8 @@ const CallEditView = customization.extend(EditView, {
                 .add('m', minutes)
                 .formatServer();
         }
-        //  model.set('date_end', endDate);
-        model.set('date_end', currentDate);
+        model.set('date_end', endDate);
+        //  model.set('date_end', currentDate);
     },
 
     });
