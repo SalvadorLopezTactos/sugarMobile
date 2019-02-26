@@ -28,11 +28,11 @@ const AccountEditView = customization.extend(EditView, {
                         		self.model.set('user_id_c','569246c7-da62-4664-ef2a-5628f649537e');
                         	}
                         	if(productos.indexOf("4") !== -1){
-                        		self.model.set('promotorfactoraje_c',modelo.name);
-                        		self.model.set('user_id1_c',modelo.id);
+                                self.model.set('promotorfactoraje_c',modelo.name);
+                                self.model.set('user_id1_c',modelo.id);
                         	}else{
-                        		self.model.set('promotorfactoraje_c','Maria de Lourdes Campos Toca');
-                        		self.model.set('user_id1_c','a04540fc-e608-56a7-ad47-562a6078519d');
+                                self.model.set('promotorfactoraje_c','9 - Sin Gestor');
+                                self.model.set('user_id1_c','569246c7-da62-4664-ef2a-5628f649537e');
                         	}
                         	if(productos.indexOf("3") !== -1){
                         		self.model.set('promotorcredit_c',modelo.name);
@@ -45,8 +45,10 @@ const AccountEditView = customization.extend(EditView, {
                             	if(productos.indexOf("1") == -1 && productos.indexOf("3") == -1 && productos.indexOf("4") == -1){
                             		self.model.set('promotorleasing_c','9 - Sin Gestor');
                             		self.model.set('user_id_c','569246c7-da62-4664-ef2a-5628f649537e');
-                            		self.model.set('promotorfactoraje_c', 'Maria de Lourdes Campos Toca');
-                            		self.model.set('user_id1_c', 'a04540fc-e608-56a7-ad47-562a6078519d');
+                            		//self.model.set('promotorfactoraje_c', 'Maria de Lourdes Campos Toca');
+                                    //self.model.set('user_id1_c', 'a04540fc-e608-56a7-ad47-562a6078519d');
+                                    self.model.set('promotorfactoraje_c', '9 - Sin Gestor');
+                                    self.model.set('user_id1_c', '569246c7-da62-4664-ef2a-5628f649537e');
                             		self.model.set('promotorcredit_c','9 - Sin Gestor');
                             		self.model.set('user_id2_c','569246c7-da62-4664-ef2a-5628f649537e');
                             	}
@@ -68,6 +70,8 @@ const AccountEditView = customization.extend(EditView, {
 
         //Validación de teléfono
         this.model.addValidationTask('validatePhoneFormat', _.bind(this.validatePhoneFormat, this));
+
+        this.model.addValidationTask('check_info', _.bind(this.doValidateInfoReq, this));
         
 
     },
@@ -134,7 +138,25 @@ validatePhoneFormat:function(fields, errors, callback){
 		              
     callback(null, fields, errors);   
 
+},
+
+doValidateInfoReq:function(fields, errors, callback){
+
+    if (this.model.get('origendelprospecto_c') == 'Prospeccion propia') {
+            var metodoProspeccion = new String(this.model.get('metodo_prospeccion_c'));
+            if (metodoProspeccion.length == 0 || this.model.get('metodo_prospeccion_c') == null) {
+                /*app.alert.show("Metodo de Prospeccion Requerido", {
+                    level: "error",
+                    title: "Debe indicar el metodo de prospecci\u00F3n",
+                    autoClose: false
+                });*/
+                errors['metodo_prospeccion_c'] = errors['metodo_prospeccion_c'] || {};
+                errors['metodo_prospeccion_c'].required = true;
+            }
+        }
+        callback(null, fields, errors);
 }
+
 
 });
 
