@@ -1,4 +1,3 @@
-
 /**
  * Creado por: Salvador Lopez Balleza
  * salvador.lopez@tactos.com.mx
@@ -226,10 +225,11 @@ const CallEditView = customization.extend(EditView, {
         this._super('_render');  
 
         if(this.isCreate){
-
-            this.disableStatus();  
+            this.disableStatus();
         }
-        
+
+        //Ocultar campo de "Enviar invitación"
+        this.hideSendInvite();
     },
 
     cambioFecha: function () {
@@ -416,6 +416,15 @@ const CallEditView = customization.extend(EditView, {
         $('select[name="status"]').parent().parent().addClass("field--readonly");
         $('select[name="status"]').parent().attr("style","pointer-events:none");
 
+    },
+
+    hideSendInvite:function(){
+        //Ocultando campo de "Enviar invitación"
+        $('.field__label').each(function(){
+                if($(this).html()=='Enviar invitación'){
+                    $(this).parent().hide()
+                }
+            });
     },
 
     disableStatusBeforeDateEnd: function(){
